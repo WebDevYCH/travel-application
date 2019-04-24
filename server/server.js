@@ -11,10 +11,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //=====================================================
 
-// The schema for graphql to reference
-const schema = require('./schema/schema');
 // Mongoose Models
 const models = require('./models');
+// The schema for graphql to reference
+const schema = require('./schema/schema');
 // Add the config keys
 const keys = require('./config/keys');
 // Connect to mongoose:
