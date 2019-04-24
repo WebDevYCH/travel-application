@@ -11,7 +11,9 @@
 		"start": "nodemon server.js"
 	},
 	"dependencies": {
-		"express": "^4.16.4"
+		"express": "^4.16.4",
+		"express-graphql": "^0.8.0",
+		"graphql": "^14.2.1"
 	},
 	"devDependencies": {
 		"cypress": "^3.2.0",
