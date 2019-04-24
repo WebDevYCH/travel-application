@@ -7,13 +7,14 @@
 	"license": "MIT",
 	"private": true,
 	"scripts": {
-		"test": "yarn run cypress open",
-		"start": "nodemon server.js"
+		"test": "nodemon index.js & yarn run cypress open",
+		"start": "nodemon index.js"
 	},
 	"dependencies": {
 		"express": "^4.16.4",
 		"express-graphql": "^0.8.0",
-		"graphql": "^14.2.1"
+		"graphql": "^14.2.1",
+		"mongoose": "^5.5.3"
 	},
 	"devDependencies": {
 		"cypress": "^3.2.0",
