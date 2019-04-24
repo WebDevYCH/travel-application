@@ -1,0 +1,20 @@
+{
+	"name": "travel-application",
+	"version": "1.0.0",
+	"main": "server.js",
+	"repository": "https://github.com/JoshBowdenConcepts/travel-application.git",
+	"author": "Josh Bowden <joshbowdenconcepts@gmail.com>",
+	"license": "MIT",
+	"private": true,
+	"scripts": {
+		"test": "yarn run cypress open",
+		"start": "nodemon server.js"
+	},
+	"dependencies": {
+		"express": "^4.16.4"
+	},
+	"devDependencies": {
+		"cypress": "^3.2.0",
+		"nodemon": "^1.18.11"
+	}
+}
