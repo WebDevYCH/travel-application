@@ -21,8 +21,6 @@ const keys = require('./config/keys');
 const MONGO_URI = keys.mongoURI;
 if (!MONGO_URI) {
 	throw new Error('You must provide a MongoLab URI');
-} else {
-	console.log(MONGO_URI);
 }
 mongoose.connect(MONGO_URI, {
 	useNewUrlParser: true,
