@@ -6,6 +6,7 @@ jobs:
     build:
         docker:
             - image: circleci/node:10.14.1
+            - image: cypress/base:8
         working_directory: ~/repo
         steps:
             - checkout
