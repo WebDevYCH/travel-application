@@ -12,4 +12,5 @@ jobs:
             - checkout
             - run: ls -l ~/repo
             - run: yarn install
-            - run: yarn run test
+            - run: yarn start
+            - run: ci:test

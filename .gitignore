@@ -62,3 +62,6 @@ typings/
 
 # config development files
 dev.js
+
+# cypress files
+cypress/videos/
