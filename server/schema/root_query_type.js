@@ -5,9 +5,11 @@ const { GraphQLObjectType, GraphQLList, GraphQLID, GraphQLNonNull } = graphql;
 // Import GraphQL Types
 const UserType = require('./user_type');
 const DestinationType = require('./destination_type');
+const ActivityType = require('./activity_type');
 // Import Mongoose Model
 const User = mongoose.model('user');
 const Destination = mongoose.model('destination');
+const Activity = mongoose.model('activity');
 
 const RootQuery = new GraphQLObjectType({
 	name: 'RootQueryType',
@@ -22,6 +24,12 @@ const RootQuery = new GraphQLObjectType({
 			type: new GraphQLList(DestinationType),
 			resolve() {
 				return Destination.find({});
+			},
+		},
+		activities: {
+			type: new GraphQLList(ActivityType),
+			resolve() {
+				return Activity.find({});
 			},
 		},
 	}),
