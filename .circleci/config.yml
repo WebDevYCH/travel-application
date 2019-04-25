@@ -1,4 +1,7 @@
 version: 2
+orbs:
+    # use Cypress orb from CircleCI registry
+    cypress: cypress-io/cypress@1.5.1
 jobs:
     build:
         docker:
@@ -14,7 +17,8 @@ jobs:
                   command: echo ${MONGO_URI}
             - run:
                   name: 'Run Testing Environment'
-                  command: 'NODE_ENV=testing MONGO_URI=${MONGO_URI} yarn start & wait-on http://localhost:5000'
+                  command: 'NODE_ENV=testing MONGO_URI=${MONGO_URI} yarn start'
+                  background: true
             - run:
                   name: 'Run Tests'
                   command: cypress run
