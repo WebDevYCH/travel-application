@@ -9,5 +9,8 @@ jobs:
             - checkout
             - run: ls -l ~/repo
             - run: yarn install
+            - run:
+                  name: 'What is my mongo uri?'
+                  command: echo ${MONGO_URI}
             - run: NODE_ENV=testing yarn start
             - run: ci:test
