@@ -11,7 +11,7 @@ jobs:
                       - cache-{{ checksum "package.json" }}
             - run:
                   name: 'Install Dependencies'
-                  command: 'yarn cypress install'
+                  command: 'yarn run cypress install'
             - save_cache:
                   key: cache-{{ checksum "package.json" }}
                   paths:
