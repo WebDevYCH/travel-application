@@ -6,7 +6,7 @@ This intention behind this application is to have people around the world share 
 
 ### Build Status:
 
-[![CircleCI](https://circleci.com/gh/JoshBowdenConcepts/travel-application.svg?style=svg)](https://circleci.com/gh/JoshBowdenConcepts/travel-application)
+[![CircleCI](https://circleci.com/gh/JoshBowdenConcepts/travel-application.svg?style=svg&circle-token=8d7201f2cf01538b3b12c9edfb41ab210e71d232)]
 
 ### Technology Stack:
 
