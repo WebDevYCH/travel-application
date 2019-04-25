@@ -12,5 +12,9 @@ jobs:
             - run:
                   name: 'What is my mongo uri?'
                   command: echo ${MONGO_URI}
-            - run: NODE_ENV=testing yarn start
+            - run:
+                  name: 'Run Testing Environment'
+                  command: 'NODE_ENV=testing yarn start'
+                  environment:
+                      MONGO_URI: ${MONGO_URI}
             - run: ci:test
