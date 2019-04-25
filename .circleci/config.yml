@@ -5,8 +5,6 @@ jobs:
             - image: circleci/node:10.14.1
 
         working_directory: ~/repo
-        environment:
-            MONGO_URI: $MONGO_URI
         steps:
             - checkout
             - run: ls -l ~/repo
