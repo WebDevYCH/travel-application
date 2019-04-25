@@ -1,17 +1,25 @@
 version: 2
-orbs:
-    # use Cypress orb from CircleCI registry
-    cypress: cypress-io/cypress@1.5.1
 jobs:
-    build:
+    test:
         docker:
-            - image: circleci/node:10.14.1
+            - image: cypress/base:10
         working_directory: ~/repo
         steps:
             - checkout
+            - restore_cache:
+                  keys:
+                      - cache-{{ checksum "package.json" }}
             - run:
-                  name: 'Install Packages'
+                  name: 'Install Dependencies'
                   command: 'yarn install'
+            - run:
+                  name: 'Verify Cypress'
+                  command: 'yarn run cypress verify'
+            - save_cache:
+                  key: cache-{{ checksum "package.json" }}
+                  paths:
+                      - ~/.npm
+                      - ~/.cache
             - run:
                   name: 'Mongo URI:'
                   command: echo ${MONGO_URI}
@@ -20,5 +28,11 @@ jobs:
                   command: 'NODE_ENV=testing MONGO_URI=${MONGO_URI} yarn start'
                   background: true
             - run:
-                  name: 'Run Tests'
-                  command: 'yarn run cypress run'
+                  name: 'E2E'
+                  command: yarn run cypress run
+
+workflows:
+    version: 2
+    build:
+        jobs:
+            - test
