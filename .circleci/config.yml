@@ -14,4 +14,7 @@ jobs:
                   command: echo ${MONGO_URI}
             - run:
                   name: 'Run Testing Environment'
-                  command: 'NODE_ENV=testing MONGO_URI=${MONGO_URI} yarn start & yarn run cypress run'
+                  command: 'NODE_ENV=testing MONGO_URI=${MONGO_URI} yarn start & wait-on http://localhost:5000'
+            - run:
+                  name: 'Run Tests'
+                  command: cypress run
