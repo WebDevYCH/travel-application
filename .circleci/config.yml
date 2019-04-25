@@ -21,4 +21,4 @@ jobs:
                   background: true
             - run:
                   name: 'Run Tests'
-                  command: cypress run
+                  command: 'yarn run cypress run'
