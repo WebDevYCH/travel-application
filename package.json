@@ -9,7 +9,7 @@
 	"scripts": {
 		"test": "nodemon index.js & yarn run cypress open",
 		"start": "nodemon index.js",
-		"ci:test": "yarn run cypress run"
+		"quickTest": "yarn start & yarn run cypress run"
 	},
 	"dependencies": {
 		"express": "^4.16.4",
