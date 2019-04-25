@@ -27,6 +27,17 @@ const DestinationType = new GraphQLObjectType({
 					});
 			},
 		},
+		likedBy: {
+			type: new GraphQLList(require('./user_type')),
+			resolve(parentValue) {
+				return Destination.findById(parentValue)
+					.populate('likedBy')
+					.then(destination => {
+						// console.log(destination);
+						return destination.likedBy;
+					});
+			},
+		},
 	}),
 });
 

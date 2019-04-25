@@ -34,6 +34,16 @@ const mutation = new GraphQLObjectType({
 				return new Destination(args).save();
 			},
 		},
+		toggleDestinationLike: {
+			type: DestinationType,
+			args: {
+				id: { type: new GraphQLNonNull(GraphQLID) },
+				userId: { type: new GraphQLNonNull(GraphQLID) },
+			},
+			resolve(parentValue, { id, userId }) {
+				return Destination.toggleLike(id, userId);
+			},
+		},
 	},
 });
 
