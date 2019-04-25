@@ -41,7 +41,7 @@ cd travel-application
 
 Install Dependencies
 ```
-yarn instal
+yarn install
 ```
 
 Start Development Server
