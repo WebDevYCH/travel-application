@@ -29,7 +29,7 @@ const mutation = new GraphQLObjectType({
 			type: UserType,
 			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
 			resolve(parentValue, { id }) {
-				return User.remove({ _id: id });
+				return User.deleteOne({ _id: id });
 			},
 		},
 		addDestination: {
@@ -57,7 +57,7 @@ const mutation = new GraphQLObjectType({
 			type: DestinationType,
 			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
 			resolve(parentValue, { id }) {
-				return Destination.remove({ _id: id });
+				return Destination.deleteOne({ _id: id });
 			},
 		},
 		addActivity: {
@@ -86,7 +86,7 @@ const mutation = new GraphQLObjectType({
 			type: ActivityType,
 			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
 			resolve(parentValue, { id }) {
-				return Activity.remove({ _id: id });
+				return Activity.deleteOne({ _id: id });
 			},
 		},
 	},
