@@ -1,6 +1,6 @@
 version: 2
 jobs:
-    build:
+    test:
         docker:
             - image: cypress/base:10
         working_directory: ~/repo
@@ -11,12 +11,15 @@ jobs:
                       - cache-{{ checksum "package.json" }}
             - run:
                   name: 'Install Dependencies'
-                  command: 'yarn run cypress install'
+                  command: 'yarn install'
+            - run:
+                  name: 'Verify Cypress'
+                  command: 'yarn run cy:verify'
             - save_cache:
                   key: cache-{{ checksum "package.json" }}
                   paths:
                       - ~/.npm
-                      - ~/.cahce
+                      - ~/.cache
             - run:
                   name: 'Mongo URI:'
                   command: echo ${MONGO_URI}
@@ -27,3 +30,9 @@ jobs:
             - run:
                   name: 'E2E'
                   command: yarn run cypress run
+
+workflows:
+    version: 2
+    build:
+        jobs:
+            - test
