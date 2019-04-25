@@ -14,7 +14,7 @@ describe('GraphQL Live Server:', () => {
 		}`;
 
 		cy.request({
-			url: 'http://localhost:5000/graphql',
+			url: 'graphql',
 			method: 'POST',
 			body: { query: addUserQuery },
 			failOnStatusCode: false, // not a must but in case the fail code is not 200 / 400
@@ -49,7 +49,7 @@ describe('GraphQL Live Server:', () => {
 		}`;
 
 		cy.request({
-			url: 'http://localhost:5000/graphql',
+			url: '/graphql',
 			method: 'POST',
 			body: { query: addDestinationQuery },
 			failOnStatusCode: false, // not a must but in case the fail code is not 200 / 400
@@ -85,7 +85,7 @@ describe('GraphQL Live Server:', () => {
 		}`;
 
 		cy.request({
-			url: 'http://localhost:5000/graphql',
+			url: '/graphql',
 			method: 'POST',
 			body: { query: addActivityQuery },
 			failOnStatusCode: false, // not a must but in case the fail code is not 200 / 400
@@ -93,6 +93,58 @@ describe('GraphQL Live Server:', () => {
 			cy.log(res);
 			const activityData = res.body.data.addActivity;
 			createdActivityID = activityData.id;
+		});
+	});
+
+	it('finds all users', () => {
+		const findAllUsersQuery = `{
+			users {
+				id
+				name
+				email
+				password
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: findAllUsersQuery },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const users = res.body.data.users;
+			expect(users).to.have.lengthOf(1);
+		});
+	});
+
+	it('finds user by id', () => {
+		const findUserByIdQuery = `{
+			user(id: "${createdUserID}") {
+				id
+				name
+				email
+				password
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: findUserByIdQuery },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const user = res.body.data.user;
+			cy.wrap(user)
+				.should('have.property', 'name')
+				.and('eq', 'Josh');
+			cy.wrap(user)
+				.should('have.property', 'email')
+				.and('eq', 'test@gmail.com');
+			cy.wrap(user)
+				.should('have.property', 'password')
+				.and('eq', 'test');
 		});
 	});
 
@@ -104,7 +156,7 @@ describe('GraphQL Live Server:', () => {
 		}`;
 
 		cy.request({
-			url: 'http://localhost:5000/graphql',
+			url: '/graphql',
 			method: 'POST',
 			body: { query: deleteActivityQuery },
 			failOnStatusCode: false,
@@ -121,7 +173,7 @@ describe('GraphQL Live Server:', () => {
 		}`;
 
 		cy.request({
-			url: 'http://localhost:5000/graphql',
+			url: '/graphql',
 			method: 'POST',
 			body: { query: deleteDestinationQuery },
 			failOnStatusCode: false,
@@ -138,7 +190,7 @@ describe('GraphQL Live Server:', () => {
 		}`;
 
 		cy.request({
-			url: 'http://localhost:5000/graphql',
+			url: '/graphql',
 			method: 'POST',
 			body: { query: deleteUserQuery },
 			failOnStatusCode: false,
