@@ -9,6 +9,11 @@ const ActivitySchema = new Schema({
 		ref: 'user',
 		required: true,
 	},
+	destination: {
+		type: Schema.Types.ObjectId,
+		ref: 'destination',
+		required: true,
+	},
 	address: { type: String },
 	price: { type: Number },
 	likedBy: [

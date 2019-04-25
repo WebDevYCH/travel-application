@@ -1,6 +1,7 @@
 describe('GraphQL Live Server:', () => {
 	let createdUserID;
 	let createdDestinationID;
+	let createdActivityID;
 
 	it('creates a user', () => {
 		const addUserQuery = `mutation {
@@ -66,9 +67,55 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	it('adds an activity', () => {
+		const addActivityQuery = `mutation {
+			addActivity(name: "Test activity", description: "This is a test activity", user: "${createdUserID}", destination: "${createdDestinationID}", address: "Test Address") {
+				id
+				name
+				description
+				user {
+					name
+					email
+				}
+				destination {
+					title
+					description
+				}
+			}
+		}`;
+
+		cy.request({
+			url: 'http://localhost:5000/graphql',
+			method: 'POST',
+			body: { query: addActivityQuery },
+			failOnStatusCode: false, // not a must but in case the fail code is not 200 / 400
+		}).then(res => {
+			cy.log(res);
+			const activityData = res.body.data.addActivity;
+			createdActivityID = activityData.id;
+		});
+	});
+
+	it('deletes an activity', () => {
+		const deleteActivityQuery = `mutation {
+			deleteActivity(id: "${createdActivityID}") {
+				id
+			}
+		}`;
+
+		cy.request({
+			url: 'http://localhost:5000/graphql',
+			method: 'POST',
+			body: { query: deleteActivityQuery },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+		});
+	});
+
 	it('deletes a destination', () => {
 		const deleteDestinationQuery = `mutation {
-			addDestination(id: "${createdDestinationID}) {
+			deleteDestination(id: "${createdDestinationID}") {
 				id
 			}
 		}`;
@@ -77,7 +124,7 @@ describe('GraphQL Live Server:', () => {
 			url: 'http://localhost:5000/graphql',
 			method: 'POST',
 			body: { query: deleteDestinationQuery },
-			failOnStatusCode: false, // not a must but in case the fail code is not 200 / 400
+			failOnStatusCode: false,
 		}).then(res => {
 			cy.log(res);
 		});
@@ -94,7 +141,7 @@ describe('GraphQL Live Server:', () => {
 			url: 'http://localhost:5000/graphql',
 			method: 'POST',
 			body: { query: deleteUserQuery },
-			failOnStatusCode: false, // not a must but in case the fail code is not 200 / 400
+			failOnStatusCode: false,
 		}).then(res => {
 			cy.log(res);
 		});

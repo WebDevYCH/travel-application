@@ -7,6 +7,7 @@ const {
 	GraphQLList,
 	GraphQLFloat,
 } = graphql;
+const Activity = mongoose.model('activity');
 
 const ActivityType = new GraphQLObjectType({
 	name: 'ActivityType',
@@ -22,6 +23,16 @@ const ActivityType = new GraphQLObjectType({
 					.then(activity => {
 						// console.log(destination);
 						return activity.user;
+					});
+			},
+		},
+		destination: {
+			type: require('./destination_type'),
+			resolve(parentValue) {
+				return Activity.findById(parentValue)
+					.populate('destination')
+					.then(activity => {
+						return activity.destination;
 					});
 			},
 		},
