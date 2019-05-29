@@ -39,6 +39,20 @@ const RootQuery = new GraphQLObjectType({
 				return User.findById(id);
 			},
 		},
+		destination: {
+			type: DestinationType,
+			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
+			resolve(parentValue, { id }) {
+				return Destination.findById(id);
+			},
+		},
+		activity: {
+			type: ActivityType,
+			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
+			resolve(parentValue, { id }) {
+				return Activity.findById(id);
+			},
+		},
 	}),
 });
 
