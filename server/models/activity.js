@@ -32,10 +32,10 @@ ActivitySchema.statics.toggleLike = function(activityId, userId) {
 		if (array.indexOf(userId) > -1) {
 			const index = array.indexOf(userId);
 			array.splice(index, 1);
-			return destination.save();
+			return activity.save();
 		}
 		array.push(userId);
-		return destination.save();
+		return activity.save();
 	});
 };
 
