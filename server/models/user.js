@@ -8,4 +8,19 @@ const UserSchema = new Schema({
 	dateCreated: { type: Date, default: Date.now },
 });
 
+UserSchema.statics.update = function(userId, updateObject) {
+	return this.findById(userId).then(user => {
+		if (updateObject.name) {
+			user.name = updateObject.name;
+		}
+		if (updateObject.email) {
+			user.email = updateObject.email;
+		}
+		if (updateObject.password) {
+			user.password = updateObject.password;
+		}
+		return user.save();
+	});
+};
+
 mongoose.model('user', UserSchema);
