@@ -114,7 +114,9 @@ describe('GraphQL Live Server:', () => {
 		}).then(res => {
 			cy.log(res);
 			const users = res.body.data.users;
-			expect(users).to.have.lengthOf(1);
+			cy.wrap(users)
+				.its('length')
+				.should('be.gt', 0);
 		});
 	});
 
@@ -145,6 +147,117 @@ describe('GraphQL Live Server:', () => {
 			cy.wrap(user)
 				.should('have.property', 'password')
 				.and('eq', 'test');
+		});
+	});
+
+	it('likes a destination', () => {
+		const likeDestinationQuery = `mutation {
+			toggleDestinationLike(id: "${createdDestinationID}", userId: "${createdUserID}") {
+				title
+				likedBy {
+				  id
+				  name
+				  email
+				}
+			  }
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: likeDestinationQuery },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const destination = res.body.data.toggleDestinationLike;
+			cy.wrap(destination)
+				.should('have.property', 'likedBy')
+				.its('length')
+				.should('be.gt', 0);
+		});
+	});
+
+	it('dislikes a destination', () => {
+		const likeDestinationQuery = `mutation {
+			toggleDestinationLike(id: "${createdDestinationID}", userId: "${createdUserID}") {
+				title
+				likedBy {
+				  id
+				  name
+				  email
+				}
+			  }
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: likeDestinationQuery },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const destination = res.body.data.toggleDestinationLike;
+			cy.wrap(destination)
+				.should('have.property', 'title')
+				.and('eq', 'Test Destination');
+			cy.wrap(destination)
+				.should('have.property', 'likedBy')
+				.its('length')
+				.should('be', 0);
+		});
+	});
+
+	it('likes a activity', () => {
+		const toggleActivityLike = `mutation {
+			toggleActivityLike(id: "${createdActivityID}", userId: "${createdUserID}") {
+				name
+				likedBy {
+				  id
+				  name
+				  email
+				}
+			  }
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: toggleActivityLike },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const destination = res.body.data.toggleActivityLike;
+			cy.wrap(destination)
+				.should('have.property', 'likedBy')
+				.its('length')
+				.should('be.gt', 0);
+		});
+	});
+
+	it('dislikes a activity', () => {
+		const toggleActivityLike = `mutation {
+			toggleActivityLike(id: "${createdActivityID}", userId: "${createdUserID}") {
+				name
+				likedBy {
+				  id
+				  name
+				  email
+				}
+			  }
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: toggleActivityLike },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const destination = res.body.data.toggleActivityLike;
+			cy.wrap(destination)
+				.should('have.property', 'likedBy')
+				.its('length')
+				.should('be', 0);
 		});
 	});
 
