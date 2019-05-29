@@ -150,6 +150,68 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	it('finds destination by id', () => {
+		const findDestinationByIdQuery = `{
+			destination(id: "${createdDestinationID}") {
+				title
+				dateCreated
+				description 
+				user {
+					name
+				}
+				likedBy {
+					name
+				}
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: findDestinationByIdQuery },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const destination = res.body.data.destination;
+			cy.wrap(destination)
+				.should('have.property', 'title')
+				.and('eq', 'Test Destination');
+		});
+	});
+
+	it('finds activity by id', () => {
+		const findActivityByIdQuery = `{
+			activity(id: "${createdActivityID}") {
+				name
+				description 
+				user {
+					name
+				}
+				destination {
+					title
+				}
+				address
+				price
+				likedBy {
+					name
+				}
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: findActivityByIdQuery },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const activity = res.body.data.activity;
+			cy.wrap(activity)
+				.should('have.property', 'name')
+				.and('eq', 'Test activity');
+		});
+	});
+
 	it('likes a destination', () => {
 		const likeDestinationQuery = `mutation {
 			toggleDestinationLike(id: "${createdDestinationID}", userId: "${createdUserID}") {
