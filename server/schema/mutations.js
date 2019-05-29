@@ -25,6 +25,22 @@ const mutation = new GraphQLObjectType({
 				return new User({ name, email, password }).save();
 			},
 		},
+		updateUser: {
+			type: UserType,
+			args: {
+				id: { type: new GraphQLNonNull(GraphQLID) },
+				name: { type: GraphQLString },
+				email: { type: GraphQLString },
+				password: { type: GraphQLString },
+			},
+			resolve(parentValue, { id, name, email, password }) {
+				return User.update(id, {
+					name,
+					email,
+					password,
+				});
+			},
+		},
 		deleteUser: {
 			type: UserType,
 			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
