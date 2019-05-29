@@ -34,6 +34,35 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	it('updates a user', () => {
+		const updateUserQuery = `mutation {
+			updateUser(id: "${createdUserID}", name: "Bill", email: "bill@gmail.com", password: "test1234") {
+				name
+				email
+				password
+			}
+		}`;
+
+		cy.request({
+			url: 'graphql',
+			method: 'POST',
+			body: { query: updateUserQuery },
+			failOnStatusCode: false, // not a must but in case the fail code is not 200 / 400
+		}).then(res => {
+			cy.log(res);
+			const user = res.body.data.updateUser;
+			cy.wrap(user)
+				.should('have.property', 'name')
+				.and('eq', 'Bill');
+			cy.wrap(user)
+				.should('have.property', 'email')
+				.and('eq', 'bill@gmail.com');
+			cy.wrap(user)
+				.should('have.property', 'password')
+				.and('eq', 'test1234');
+		});
+	});
+
 	it('adds a destination', () => {
 		const addDestinationQuery = `mutation {
 			addDestination(title: "Test Destination", description: "It is a test. It is awesome if it works", user: "${createdUserID}") {
@@ -140,13 +169,13 @@ describe('GraphQL Live Server:', () => {
 			const user = res.body.data.user;
 			cy.wrap(user)
 				.should('have.property', 'name')
-				.and('eq', 'Josh');
+				.and('eq', 'Bill');
 			cy.wrap(user)
 				.should('have.property', 'email')
-				.and('eq', 'test@gmail.com');
+				.and('eq', 'bill@gmail.com');
 			cy.wrap(user)
 				.should('have.property', 'password')
-				.and('eq', 'test');
+				.and('eq', 'test1234');
 		});
 	});
 
