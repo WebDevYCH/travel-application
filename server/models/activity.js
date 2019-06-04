@@ -40,4 +40,28 @@ ActivitySchema.statics.toggleLike = function(activityId, userId) {
 	});
 };
 
+ActivitySchema.statics.update = function(activityId, userId, updateObject) {
+	return this.findById(activityId).then(activity => {
+		if (activity.user == userId) {
+			if (updateObject.name) {
+				activity.name = updateObject.name;
+			}
+			if (updateObject.description) {
+				activity.description = updateObject.description;
+			}
+			if (updateObject.destination) {
+				activity.destination = updateObject.destination;
+			}
+			if (updateObject.address) {
+				activity.address = updateObject.address;
+			}
+			return activity.save();
+		} else {
+			return new Error(
+				`User Authentication Error: You must be the user that created the activity to update it`
+			);
+		}
+	});
+};
+
 mongoose.model('activity', ActivitySchema);
