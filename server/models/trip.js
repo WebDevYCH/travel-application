@@ -38,4 +38,19 @@ const TripSchema = new Schema({
 	],
 });
 
+TripSchema.statics.toggleLike = function(tripId, userId) {
+	const User = mongoose.model('user');
+
+	return this.findById(tripId).then(trip => {
+		const array = trip.likedBy;
+		if (array.indexOf(userId) > -1) {
+			const index = array.indexOf(userId);
+			array.splice(index, 1);
+			return activity.save();
+		}
+		array.push(userId);
+		return trip.save();
+	});
+};
+
 mongoose.model('trip', TripSchema);
