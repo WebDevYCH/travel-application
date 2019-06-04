@@ -6,10 +6,14 @@ const mongoose = require('mongoose');
 const UserType = require('./user_type');
 const DestinationType = require('./destination_type');
 const ActivityType = require('./activity_type');
+const TransitType = require('./transit_type');
+const TripType = require('./trip_type');
 // Import Mongoose Model
 const User = mongoose.model('user');
 const Destination = mongoose.model('destination');
 const Activity = mongoose.model('activity');
+const Transit = mongoose.model('transit');
+const Trip = mongoose.model('trip');
 
 const mutation = new GraphQLObjectType({
 	name: 'Mutation',
@@ -141,6 +145,55 @@ const mutation = new GraphQLObjectType({
 			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
 			resolve(parentValue, { id }) {
 				return Activity.deleteOne({ _id: id });
+			},
+		},
+		addTransit: {
+			type: TransitType,
+			args: {
+				name: { type: new GraphQLNonNull(GraphQLString) },
+				description: { type: new GraphQLNonNull(GraphQLString) },
+				user: { type: new GraphQLNonNull(GraphQLID) },
+				startDestination: { type: new GraphQLNonNull(GraphQLID) },
+				endDestination: { type: new GraphQLNonNull(GraphQLID) },
+			},
+			resolve(parentValue, args) {
+				return new Transit(args).save();
+			},
+		},
+		updateTransit: {
+			type: TransitType,
+			args: {
+				id: { type: new GraphQLNonNull(GraphQLID) },
+				name: { type: GraphQLString },
+				description: { type: GraphQLString },
+				user: { type: GraphQLID },
+				startDestination: { type: GraphQLID },
+				endDestination: { type: GraphQLID },
+			},
+			resolve(
+				parentValue,
+				{
+					id,
+					user,
+					name,
+					description,
+					startDestination,
+					endDestination,
+				}
+			) {
+				return Transit.update(id, user, {
+					name,
+					description,
+					startDestination,
+					endDestination,
+				});
+			},
+		},
+		deleteTransit: {
+			type: TransitType,
+			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
+			resolve(parentValue, { id }) {
+				return Transit.deleteOne({ _id: id });
 			},
 		},
 	},
