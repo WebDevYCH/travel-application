@@ -33,4 +33,26 @@ DestinationSchema.statics.toggleLike = function(destinationId, userId) {
 	});
 };
 
+DestinationSchema.statics.update = function(
+	destinationId,
+	userId,
+	updateObject
+) {
+	return this.findById(destinationId).then(destination => {
+		if (destination.user == userId) {
+			if (updateObject.title) {
+				destination.title = updateObject.title;
+			}
+			if (updateObject.description) {
+				destination.description = updateObject.description;
+			}
+			return destination.save();
+		} else {
+			return new Error(
+				`User Authentication Error: You must be the user that created the destination to update it`
+			);
+		}
+	});
+};
+
 mongoose.model('destination', DestinationSchema);
