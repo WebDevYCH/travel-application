@@ -13,10 +13,12 @@ const TransitSchema = new Schema({
 	startDestination: {
 		type: Schema.Types.ObjectId,
 		ref: 'destination',
+		required: true,
 	},
 	endDestination: {
 		type: Schema.Types.ObjectId,
 		ref: 'destination',
+		required: true,
 	},
 	likedBy: [
 		{
@@ -39,6 +41,30 @@ TransitSchema.statics.toggleLike = function(transitId, userId) {
 		}
 		array.push(userId);
 		return transit.save();
+	});
+};
+
+TransitSchema.statics.update = function(transitId, userId, updateObject) {
+	return this.findById(transitId).then(transit => {
+		if (transit.user == userId) {
+			if (updateObject.name) {
+				transit.name = updateObject.name;
+			}
+			if (updateObject.description) {
+				transit.description = updateObject.description;
+			}
+			if (updateObject.startDestination) {
+				transit.startDestination = updateObject.startDestination;
+			}
+			if (updateObject.endDestination) {
+				transit.endDestination = updateObject.endDestination;
+			}
+			return transit.save();
+		} else {
+			return new Error(
+				`User Authentication Error: You must be the user that created the transit to update it`
+			);
+		}
 	});
 };
 

@@ -1,8 +1,10 @@
 describe('GraphQL Live Server:', () => {
 	let createdUserID;
 	let createdDestinationID;
+	let createdDestinationID2;
 	let createdActivityID;
 	let createdUserAtTime;
+	let createdTransitID;
 
 	it('creates a user', () => {
 		const addUserQuery = `mutation {
@@ -99,6 +101,39 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	it('adds a second destination', () => {
+		const addDestinationQuery = `mutation {
+			addDestination(title: "Test Destination 2", description: "It is a test. It is awesome if it works", user: "${createdUserID}") {
+				id
+				title
+				user {
+					id
+					name
+					email
+				}
+				description
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: addDestinationQuery },
+			failOnStatusCode: false, // not a must but in case the fail code is not 200 / 400
+		}).then(res => {
+			cy.log(res);
+			const destinationData = res.body.data.addDestination;
+			createdDestinationID2 = destinationData.id;
+			cy.wrap(destinationData)
+				.should('have.property', 'title')
+				.and('eq', 'Test Destination 2');
+			cy.wrap(destinationData)
+				.should('have.property', 'description')
+				.and('eq', 'It is a test. It is awesome if it works');
+			cy.wrap(destinationData).should('have.property', 'user');
+		});
+	});
+
 	it('adds an activity', () => {
 		const addActivityQuery = `mutation {
 			addActivity(name: "Test activity", description: "This is a test activity", user: "${createdUserID}", destination: "${createdDestinationID}", address: "Test Address") {
@@ -125,6 +160,39 @@ describe('GraphQL Live Server:', () => {
 			cy.log(res);
 			const activityData = res.body.data.addActivity;
 			createdActivityID = activityData.id;
+		});
+	});
+
+	it('adds a transit', () => {
+		const addTransitQuery = `mutation {
+			addTransit(name: "Test Transit", description: "Test Transit Description", user: "${createdUserID}", startDestination: "${createdDestinationID}", endDestination: "${createdDestinationID2}") {
+				id
+				name
+				description
+				user {
+					name
+					email
+				}
+				startDestination {
+					title
+					description
+				}
+				endDestination {
+					title
+					description
+				}
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: addTransitQuery },
+			failOnStatusCode: false, // not a must but in case the fail code is not 200 / 400
+		}).then(res => {
+			cy.log(res);
+			const transitData = res.body.data.addTransit;
+			createdTransitID = transitData.id;
 		});
 	});
 
@@ -424,6 +492,42 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	// it('updates a transit', () => {
+	// 	const updateTransit = `mutation {
+	// 		updateTransit(id: "${createdTransitID}", user: "${createdUserID}", name: "Updated Transit Name", description: "Updated Transit Description", startDestination: "${createdDestinationID2}", endDestination: "${createdDestinationID}") {
+	// 			name
+	// 			description
+	// 			startDestination {
+	// 				title
+	// 			}
+	// 			endDestination {
+	// 				title
+	// 			}
+	// 	}`;
+
+	// 	cy.request({
+	// 		url: '/graphql',
+	// 		method: 'POST',
+	// 		body: { query: updateTransit },
+	// 		failOnStatusCode: false,
+	// 	}).then(res => {
+	// 		cy.log(res);
+	// 		const transit = res.body.data.updateTransit;
+	// 		cy.wrap(transit)
+	// 			.should('have.property', 'name')
+	// 			.should('eq', 'Updated Transit Name');
+	// 		cy.wrap(transit)
+	// 			.should('have.property', 'description')
+	// 			.should('eq', 'Updated Transit Description');
+	// 		cy.wrap(transit)
+	// 			.should('have.property', 'startDestination')
+	// 			.should('eq', createdDestinationID2);
+	// 		cy.wrap(transit)
+	// 			.should('have.property', 'endDestination')
+	// 			.should('eq', createdDestinationID);
+	// 	});
+	// });
+
 	it('deletes an activity', () => {
 		const deleteActivityQuery = `mutation {
 			deleteActivity(id: "${createdActivityID}") {
@@ -441,9 +545,26 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
-	it('deletes a destination', () => {
+	it('deletes first destination', () => {
 		const deleteDestinationQuery = `mutation {
 			deleteDestination(id: "${createdDestinationID}") {
+				id
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: deleteDestinationQuery },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+		});
+	});
+
+	it('deletes second destination', () => {
+		const deleteDestinationQuery = `mutation {
+			deleteDestination(id: "${createdDestinationID2}") {
 				id
 			}
 		}`;
@@ -469,6 +590,23 @@ describe('GraphQL Live Server:', () => {
 			url: '/graphql',
 			method: 'POST',
 			body: { query: deleteUserQuery },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+		});
+	});
+
+	it('deletes a transit', () => {
+		const deleteTransitQuery = `mutation {
+			deleteTransit(id: "${createdTransitID}") {
+				id
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: deleteTransitQuery },
 			failOnStatusCode: false,
 		}).then(res => {
 			cy.log(res);
