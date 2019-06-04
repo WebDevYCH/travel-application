@@ -2,6 +2,7 @@ describe('GraphQL Live Server:', () => {
 	let createdUserID;
 	let createdDestinationID;
 	let createdActivityID;
+	let createdUserAtTime;
 
 	it('creates a user', () => {
 		const addUserQuery = `mutation {
@@ -10,6 +11,7 @@ describe('GraphQL Live Server:', () => {
 				  name
 				  email
 				  password
+				  dateCreated
 			}
 		}`;
 
@@ -22,6 +24,7 @@ describe('GraphQL Live Server:', () => {
 			cy.log(res);
 			const userData = res.body.data.addUser;
 			createdUserID = userData.id;
+			createdUserAtTime = userData.dateCreated;
 			cy.wrap(userData)
 				.should('have.property', 'name')
 				.and('eq', 'Josh');
@@ -156,6 +159,7 @@ describe('GraphQL Live Server:', () => {
 				name
 				email
 				password
+				dateCreated
 			}
 		}`;
 
@@ -176,6 +180,9 @@ describe('GraphQL Live Server:', () => {
 			cy.wrap(user)
 				.should('have.property', 'password')
 				.and('eq', 'test1234');
+			cy.wrap(user) // Date created remains the same after update
+				.should('have.property', 'dateCreated')
+				.and('eq', createdUserAtTime);
 		});
 	});
 
@@ -298,6 +305,35 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	it('updates a destination', () => {
+		const updateDestination = `mutation {
+			updateDestination(id: "${createdDestinationID}", user: "${createdUserID}", title: "Updated Destination Title", description: "Updated destination description") {
+				title
+				description
+				user {
+					name
+				}
+				dateCreated
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: updateDestination },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const destination = res.body.data.updateDestination;
+			cy.wrap(destination)
+				.should('have.property', 'title')
+				.should('eq', 'Updated Destination Title');
+			cy.wrap(destination)
+				.should('have.property', 'description')
+				.should('eq', 'Updated destination description');
+		});
+	});
+
 	it('likes a activity', () => {
 		const toggleActivityLike = `mutation {
 			toggleActivityLike(id: "${createdActivityID}", userId: "${createdUserID}") {
@@ -349,6 +385,42 @@ describe('GraphQL Live Server:', () => {
 				.should('have.property', 'likedBy')
 				.its('length')
 				.should('be', 0);
+		});
+	});
+
+	it('updates an activity', () => {
+		const updateActivity = `mutation {
+			updateActivity(id: "${createdActivityID}", user: "${createdUserID}", name: "Updated Activity Name", description: "Updated Activity Description", address: "Updated Activity Address, 01945") {
+				id
+				name
+				description
+				user {
+					name
+				}
+				destination {
+					title
+				}
+				address
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: updateActivity },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const activity = res.body.data.updateActivity;
+			cy.wrap(activity)
+				.should('have.property', 'name')
+				.should('eq', 'Updated Activity Name');
+			cy.wrap(activity)
+				.should('have.property', 'description')
+				.should('eq', 'Updated Activity Description');
+			cy.wrap(activity)
+				.should('have.property', 'address')
+				.should('eq', 'Updated Activity Address, 01945');
 		});
 	});
 
