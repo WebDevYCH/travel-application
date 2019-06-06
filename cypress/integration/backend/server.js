@@ -36,7 +36,7 @@ describe('GraphQL Live Server:', () => {
 				.and('eq', 'test@gmail.com');
 			cy.wrap(userData)
 				.should('have.property', 'password')
-				.and('eq', 'test');
+				.and('not.eq', 'test');
 		});
 	});
 
@@ -65,7 +65,7 @@ describe('GraphQL Live Server:', () => {
 				.and('eq', 'bill@gmail.com');
 			cy.wrap(user)
 				.should('have.property', 'password')
-				.and('eq', 'test1234');
+				.and('not.eq', 'test1234');
 		});
 	});
 
@@ -304,7 +304,7 @@ describe('GraphQL Live Server:', () => {
 				.and('eq', 'bill@gmail.com');
 			cy.wrap(user)
 				.should('have.property', 'password')
-				.and('eq', 'test1234');
+				.and('not.eq', 'test1234');
 			cy.wrap(user) // Date created remains the same after update
 				.should('have.property', 'dateCreated')
 				.and('eq', createdUserAtTime);
@@ -808,7 +808,7 @@ describe('GraphQL Live Server:', () => {
 
 	it('deletes a trip', () => {
 		const deleteTripQuery = `mutation {
-			deleteTransit(id: "${createdTripID}") {
+			deleteTrip(id: "${createdTripID}") {
 				id
 			}
 		}`;

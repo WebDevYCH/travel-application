@@ -32,6 +32,7 @@ const mutation = new GraphQLObjectType({
 				password: { type: new GraphQLNonNull(GraphQLString) },
 			},
 			resolve(parentValue, { name, email, password }) {
+				password = User.generateHash(password);
 				return new User({ name, email, password }).save();
 			},
 		},
@@ -44,6 +45,9 @@ const mutation = new GraphQLObjectType({
 				password: { type: GraphQLString },
 			},
 			resolve(parentValue, { id, name, email, password }) {
+				if (password) {
+					password = User.generateHash(password);
+				}
 				return User.update(id, {
 					name,
 					email,

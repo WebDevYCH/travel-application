@@ -12,6 +12,7 @@
 		"quickTest": "yarn start & yarn run cypress run"
 	},
 	"dependencies": {
+		"bcryptjs": "^2.4.3",
 		"express": "^4.16.4",
 		"express-graphql": "^0.8.0",
 		"graphql": "^14.2.1",
