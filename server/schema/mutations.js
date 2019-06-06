@@ -166,7 +166,7 @@ const mutation = new GraphQLObjectType({
 				id: { type: new GraphQLNonNull(GraphQLID) },
 				name: { type: GraphQLString },
 				description: { type: GraphQLString },
-				user: { type: GraphQLID },
+				user: { type: new GraphQLNonNull(GraphQLID) },
 				startDestination: { type: GraphQLID },
 				endDestination: { type: GraphQLID },
 			},

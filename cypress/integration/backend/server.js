@@ -492,41 +492,41 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
-	// it('updates a transit', () => {
-	// 	const updateTransit = `mutation {
-	// 		updateTransit(id: "${createdTransitID}", user: "${createdUserID}", name: "Updated Transit Name", description: "Updated Transit Description", startDestination: "${createdDestinationID2}", endDestination: "${createdDestinationID}") {
-	// 			name
-	// 			description
-	// 			startDestination {
-	// 				title
-	// 			}
-	// 			endDestination {
-	// 				title
-	// 			}
-	// 	}`;
+	it('updates a transit', () => {
+		const updateTransit = `mutation {
+			updateTransit(id: "${createdTransitID}", user: "${createdUserID}", name: "Updated Transit Name", description: "Updated Transit Description", startDestination: "${createdDestinationID2}", endDestination: "${createdDestinationID}") {
+				name
+				description
+				startDestination {
+					title
+					description
+				}
+				endDestination {
+					title
+					description
+				}
+				user {
+					name
+				}
+			}
+		}`;
 
-	// 	cy.request({
-	// 		url: '/graphql',
-	// 		method: 'POST',
-	// 		body: { query: updateTransit },
-	// 		failOnStatusCode: false,
-	// 	}).then(res => {
-	// 		cy.log(res);
-	// 		const transit = res.body.data.updateTransit;
-	// 		cy.wrap(transit)
-	// 			.should('have.property', 'name')
-	// 			.should('eq', 'Updated Transit Name');
-	// 		cy.wrap(transit)
-	// 			.should('have.property', 'description')
-	// 			.should('eq', 'Updated Transit Description');
-	// 		cy.wrap(transit)
-	// 			.should('have.property', 'startDestination')
-	// 			.should('eq', createdDestinationID2);
-	// 		cy.wrap(transit)
-	// 			.should('have.property', 'endDestination')
-	// 			.should('eq', createdDestinationID);
-	// 	});
-	// });
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: updateTransit },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const transit = res.body.data.updateTransit;
+			cy.wrap(transit)
+				.should('have.property', 'name')
+				.should('eq', 'Updated Transit Name');
+			cy.wrap(transit)
+				.should('have.property', 'description')
+				.should('eq', 'Updated Transit Description');
+		});
+	});
 
 	it('deletes an activity', () => {
 		const deleteActivityQuery = `mutation {
