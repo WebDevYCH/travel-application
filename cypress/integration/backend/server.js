@@ -639,6 +639,88 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	it('likes a trip', () => {
+		const toggleTripLike = `mutation {
+			toggleTripLike(id: "${createdTripID}", userId: "${createdUserID}") {
+				name
+				likedBy {
+				  id
+				  name
+				  email
+				}
+			  }
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: toggleTripLike },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const trip = res.body.data.toggleTripLike;
+			cy.wrap(trip)
+				.should('have.property', 'likedBy')
+				.its('length')
+				.should('be.gt', 0);
+		});
+	});
+
+	it('dislikes a trip', () => {
+		const toggleTripLike = `mutation {
+			toggleTripLike(id: "${createdTripID}", userId: "${createdUserID}") {
+				name
+				likedBy {
+				  id
+				  name
+				  email
+				}
+			  }
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: toggleTripLike },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const trip = res.body.data.toggleTripLike;
+			cy.wrap(trip)
+				.should('have.property', 'likedBy')
+				.its('length')
+				.should('be', 0);
+		});
+	});
+
+	it('updates a trip', () => {
+		const updateTrip = `mutation {
+			updateTrip(id: "${createdTripID}", user: "${createdUserID}", name: "Updated Trip Name", description: "Updated Trip Description", destinations: ["${createdDestinationID2}", "${createdDestinationID}"], transits: ["${createdTransitID}"], activities: ["${createdActivityID}"]) {
+				name
+				description
+				user {
+					name
+				}
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: updateTrip },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const trip = res.body.data.updateTrip;
+			cy.wrap(trip)
+				.should('have.property', 'name')
+				.should('eq', 'Updated Trip Name');
+			cy.wrap(trip)
+				.should('have.property', 'description')
+				.should('eq', 'Updated Trip Description');
+		});
+	});
+
 	it('deletes an activity', () => {
 		const deleteActivityQuery = `mutation {
 			deleteActivity(id: "${createdActivityID}") {
