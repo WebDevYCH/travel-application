@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const bcrypt = require('bcryptjs');
 
 const UserSchema = new Schema({
 	name: { type: String, required: true },
@@ -21,6 +22,16 @@ UserSchema.statics.update = function(userId, updateObject) {
 		}
 		return user.save();
 	});
+};
+
+// generating a hash
+UserSchema.statics.generateHash = function(password) {
+	return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+};
+
+// checking if password is valid
+UserSchema.statics.validPassword = function(password) {
+	return bcrypt.compareSync(password, this.password);
 };
 
 mongoose.model('user', UserSchema);
