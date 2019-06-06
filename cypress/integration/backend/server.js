@@ -5,6 +5,7 @@ describe('GraphQL Live Server:', () => {
 	let createdActivityID;
 	let createdUserAtTime;
 	let createdTransitID;
+	let createdTripID;
 
 	it('creates a user', () => {
 		const addUserQuery = `mutation {
@@ -193,6 +194,62 @@ describe('GraphQL Live Server:', () => {
 			cy.log(res);
 			const transitData = res.body.data.addTransit;
 			createdTransitID = transitData.id;
+		});
+	});
+
+	it('adds a trip', () => {
+		const addTrip = `mutation {
+			addTrip(name: "Test Trip", description: "Test Trip Description", user: "${createdUserID}", destinations: ["${createdDestinationID}", "${createdDestinationID2}"], transits: ["${createdTransitID}"], activities: ["${createdActivityID}"]) {
+				id
+				name
+				description
+				dateCreated
+				user {
+					name
+					email
+				}
+				destinations {
+					title
+					description
+				}
+				transits {
+					name
+					description
+				}
+				activities {
+					name
+					description
+				}
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: addTrip },
+			failOnStatusCode: false, // not a must but in case the fail code is not 200 / 400
+		}).then(res => {
+			cy.log(res);
+			const trip = res.body.data.addTrip;
+			createdTripID = trip.id;
+			cy.wrap(trip)
+				.should('have.property', 'name')
+				.and('eq', 'Test Trip');
+			cy.wrap(trip)
+				.should('have.property', 'description')
+				.and('eq', 'Test Trip Description');
+			cy.wrap(trip)
+				.should('have.property', 'destinations')
+				.its('length')
+				.should('be', 2);
+			cy.wrap(trip)
+				.should('have.property', 'transits')
+				.its('length')
+				.should('be', 1);
+			cy.wrap(trip)
+				.should('have.property', 'activities')
+				.its('length')
+				.should('be', 1);
 		});
 	});
 
@@ -492,6 +549,60 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	it('likes a transit', () => {
+		const toggleTransitLike = `mutation {
+			toggleTransitLike(id: "${createdTransitID}", userId: "${createdUserID}") {
+				name
+				likedBy {
+				  id
+				  name
+				  email
+				}
+			  }
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: toggleTransitLike },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const transit = res.body.data.toggleTransitLike;
+			cy.wrap(transit)
+				.should('have.property', 'likedBy')
+				.its('length')
+				.should('be.gt', 0);
+		});
+	});
+
+	it('dislikes a transit', () => {
+		const toggleTransitLike = `mutation {
+			toggleTransitLike(id: "${createdTransitID}", userId: "${createdUserID}") {
+				name
+				likedBy {
+				  id
+				  name
+				  email
+				}
+			  }
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: toggleTransitLike },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const transit = res.body.data.toggleTransitLike;
+			cy.wrap(transit)
+				.should('have.property', 'likedBy')
+				.its('length')
+				.should('be', 0);
+		});
+	});
+
 	it('updates a transit', () => {
 		const updateTransit = `mutation {
 			updateTransit(id: "${createdTransitID}", user: "${createdUserID}", name: "Updated Transit Name", description: "Updated Transit Description", startDestination: "${createdDestinationID2}", endDestination: "${createdDestinationID}") {
@@ -525,6 +636,88 @@ describe('GraphQL Live Server:', () => {
 			cy.wrap(transit)
 				.should('have.property', 'description')
 				.should('eq', 'Updated Transit Description');
+		});
+	});
+
+	it('likes a trip', () => {
+		const toggleTripLike = `mutation {
+			toggleTripLike(id: "${createdTripID}", userId: "${createdUserID}") {
+				name
+				likedBy {
+				  id
+				  name
+				  email
+				}
+			  }
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: toggleTripLike },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const trip = res.body.data.toggleTripLike;
+			cy.wrap(trip)
+				.should('have.property', 'likedBy')
+				.its('length')
+				.should('be.gt', 0);
+		});
+	});
+
+	it('dislikes a trip', () => {
+		const toggleTripLike = `mutation {
+			toggleTripLike(id: "${createdTripID}", userId: "${createdUserID}") {
+				name
+				likedBy {
+				  id
+				  name
+				  email
+				}
+			  }
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: toggleTripLike },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const trip = res.body.data.toggleTripLike;
+			cy.wrap(trip)
+				.should('have.property', 'likedBy')
+				.its('length')
+				.should('be', 0);
+		});
+	});
+
+	it('updates a trip', () => {
+		const updateTrip = `mutation {
+			updateTrip(id: "${createdTripID}", user: "${createdUserID}", name: "Updated Trip Name", description: "Updated Trip Description", destinations: ["${createdDestinationID2}", "${createdDestinationID}"], transits: ["${createdTransitID}"], activities: ["${createdActivityID}"]) {
+				name
+				description
+				user {
+					name
+				}
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: updateTrip },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const trip = res.body.data.updateTrip;
+			cy.wrap(trip)
+				.should('have.property', 'name')
+				.should('eq', 'Updated Trip Name');
+			cy.wrap(trip)
+				.should('have.property', 'description')
+				.should('eq', 'Updated Trip Description');
 		});
 	});
 
@@ -607,6 +800,23 @@ describe('GraphQL Live Server:', () => {
 			url: '/graphql',
 			method: 'POST',
 			body: { query: deleteTransitQuery },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+		});
+	});
+
+	it('deletes a trip', () => {
+		const deleteTripQuery = `mutation {
+			deleteTransit(id: "${createdTripID}") {
+				id
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: deleteTripQuery },
 			failOnStatusCode: false,
 		}).then(res => {
 			cy.log(res);

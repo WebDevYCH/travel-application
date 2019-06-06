@@ -27,7 +27,7 @@ const TripType = new GraphQLObjectType({
 			},
 		},
 		destinations: {
-			type: require('./destination_type'),
+			type: new GraphQLList(require('./destination_type')),
 			resolve(parentValue) {
 				return Trip.findById(parentValue)
 					.populate('destinations')
@@ -37,7 +37,7 @@ const TripType = new GraphQLObjectType({
 			},
 		},
 		transits: {
-			type: require('./transit_type'),
+			type: new GraphQLList(require('./transit_type')),
 			resolve(parentValue) {
 				return Trip.findById(parentValue)
 					.populate('transits')
@@ -47,7 +47,7 @@ const TripType = new GraphQLObjectType({
 			},
 		},
 		activities: {
-			type: require('./activity_type'),
+			type: new GraphQLList(require('./activity_type')),
 			resolve(parentValue) {
 				return Trip.findById(parentValue)
 					.populate('activities')

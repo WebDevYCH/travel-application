@@ -46,10 +46,37 @@ TripSchema.statics.toggleLike = function(tripId, userId) {
 		if (array.indexOf(userId) > -1) {
 			const index = array.indexOf(userId);
 			array.splice(index, 1);
-			return activity.save();
+			return trip.save();
 		}
 		array.push(userId);
 		return trip.save();
+	});
+};
+
+TripSchema.statics.update = function(tripId, userId, updateObject) {
+	return this.findById(tripId).then(trip => {
+		if (trip.user == userId) {
+			if (updateObject.name) {
+				trip.name = updateObject.name;
+			}
+			if (updateObject.description) {
+				trip.description = updateObject.description;
+			}
+			if (updateObject.destinations) {
+				trip.destination = updateObject.destinations;
+			}
+			if (updateObject.transits) {
+				trip.address = updateObject.transits;
+			}
+			if (updateObject.activities) {
+				trip.address = updateObject.activities;
+			}
+			return trip.save();
+		} else {
+			return new Error(
+				`User Authentication Error: You must be the user that created the trip to update it`
+			);
+		}
 	});
 };
 

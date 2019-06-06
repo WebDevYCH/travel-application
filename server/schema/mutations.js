@@ -1,5 +1,11 @@
 const graphql = require('graphql');
-const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLNonNull } = graphql;
+const {
+	GraphQLObjectType,
+	GraphQLString,
+	GraphQLID,
+	GraphQLNonNull,
+	GraphQLList,
+} = graphql;
 const mongoose = require('mongoose');
 
 // Import GraphQL Types
@@ -160,6 +166,16 @@ const mutation = new GraphQLObjectType({
 				return new Transit(args).save();
 			},
 		},
+		toggleTransitLike: {
+			type: TransitType,
+			args: {
+				id: { type: new GraphQLNonNull(GraphQLID) },
+				userId: { type: new GraphQLNonNull(GraphQLID) },
+			},
+			resolve(parentValue, { id, userId }) {
+				return Transit.toggleLike(id, userId);
+			},
+		},
 		updateTransit: {
 			type: TransitType,
 			args: {
@@ -194,6 +210,75 @@ const mutation = new GraphQLObjectType({
 			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
 			resolve(parentValue, { id }) {
 				return Transit.deleteOne({ _id: id });
+			},
+		},
+		addTrip: {
+			type: TripType,
+			args: {
+				name: { type: new GraphQLNonNull(GraphQLString) },
+				description: { type: new GraphQLNonNull(GraphQLString) },
+				user: { type: new GraphQLNonNull(GraphQLID) },
+				destinations: {
+					type: new GraphQLList(GraphQLID),
+				},
+				transits: {
+					type: new GraphQLList(GraphQLID),
+				},
+				activities: {
+					type: new GraphQLList(GraphQLID),
+				},
+			},
+			resolve(parentValue, args) {
+				return new Trip(args).save();
+			},
+		},
+		toggleTripLike: {
+			type: TripType,
+			args: {
+				id: { type: new GraphQLNonNull(GraphQLID) },
+				userId: { type: new GraphQLNonNull(GraphQLID) },
+			},
+			resolve(parentValue, { id, userId }) {
+				return Trip.toggleLike(id, userId);
+			},
+		},
+		updateTrip: {
+			type: TripType,
+			args: {
+				id: { type: new GraphQLNonNull(GraphQLID) },
+				name: { type: GraphQLString },
+				description: { type: GraphQLString },
+				user: { type: new GraphQLNonNull(GraphQLID) },
+				destinations: { type: new GraphQLList(GraphQLID) },
+				transits: { type: new GraphQLList(GraphQLID) },
+				activities: { type: new GraphQLList(GraphQLID) },
+			},
+			resolve(
+				parentValue,
+				{
+					id,
+					user,
+					name,
+					description,
+					destinations,
+					transits,
+					activities,
+				}
+			) {
+				return Trip.update(id, user, {
+					name,
+					description,
+					destinations,
+					transits,
+					activities,
+				});
+			},
+		},
+		deleteTrip: {
+			type: TripType,
+			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
+			resolve(parentValue, { id }) {
+				return Trip.deleteOne({ _id: id });
 			},
 		},
 	},
