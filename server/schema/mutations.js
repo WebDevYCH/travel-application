@@ -209,6 +209,9 @@ const mutation = new GraphQLObjectType({
 				user: { type: new GraphQLNonNull(GraphQLID) },
 				startDestination: { type: new GraphQLNonNull(GraphQLID) },
 				endDestination: { type: new GraphQLNonNull(GraphQLID) },
+				tags: {
+					type: new GraphQLNonNull(new GraphQLList(GraphQLString)),
+				},
 			},
 			resolve(parentValue, args) {
 				return new Transit(args).save();
@@ -224,6 +227,18 @@ const mutation = new GraphQLObjectType({
 				return Transit.toggleLike(id, userId);
 			},
 		},
+		addTransitTags: {
+			type: TransitType,
+			args: {
+				id: { type: new GraphQLNonNull(GraphQLID) },
+				tags: {
+					type: new GraphQLNonNull(new GraphQLList(GraphQLString)),
+				},
+			},
+			resolve(parentValue, { id, tags }) {
+				return Transit.addTags(id, tags);
+			},
+		},
 		updateTransit: {
 			type: TransitType,
 			args: {
@@ -233,6 +248,9 @@ const mutation = new GraphQLObjectType({
 				user: { type: new GraphQLNonNull(GraphQLID) },
 				startDestination: { type: GraphQLID },
 				endDestination: { type: GraphQLID },
+				tags: {
+					type: new GraphQLList(GraphQLString),
+				},
 			},
 			resolve(
 				parentValue,
@@ -243,6 +261,7 @@ const mutation = new GraphQLObjectType({
 					description,
 					startDestination,
 					endDestination,
+					tags,
 				}
 			) {
 				return Transit.update(id, user, {
@@ -250,6 +269,7 @@ const mutation = new GraphQLObjectType({
 					description,
 					startDestination,
 					endDestination,
+					tags,
 				});
 			},
 		},
