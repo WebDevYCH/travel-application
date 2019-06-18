@@ -71,7 +71,7 @@ describe('GraphQL Live Server:', () => {
 
 	it('adds a destination', () => {
 		const addDestinationQuery = `mutation {
-			addDestination(title: "Test Destination", description: "It is a test. It is awesome if it works", user: "${createdUserID}", climate: "cold") {
+			addDestination(title: "Test Destination", description: "It is a test. It is awesome if it works", user: "${createdUserID}", climate: "cold", tags: ["First Destination", "Fun"]) {
 				id
 				title
 				user {
@@ -81,6 +81,7 @@ describe('GraphQL Live Server:', () => {
 				}
 				description
 				climate
+				tags
 			}
 		}`;
 
@@ -108,7 +109,7 @@ describe('GraphQL Live Server:', () => {
 
 	it('adds a second destination', () => {
 		const addDestinationQuery = `mutation {
-			addDestination(title: "Test Destination 2", description: "It is a test. It is awesome if it works", user: "${createdUserID}", climate: "warm") {
+			addDestination(title: "Test Destination 2", description: "It is a test. It is awesome if it works", user: "${createdUserID}", climate: "warm", tags: ["Second Destination", "Lame"]) {
 				id
 				title
 				user {
@@ -118,6 +119,7 @@ describe('GraphQL Live Server:', () => {
 				}
 				description
 				climate
+				tags
 			}
 		}`;
 
@@ -439,15 +441,42 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	it('adds tags to a destination', () => {
+		const addTagsToDestination = `mutation {
+			addDestinationTags(id: "${createdDestinationID}", tags: ["Added Destination Tag"]) {
+				title
+				tags
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: addTagsToDestination },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const destination = res.body.data.addDestinationTags;
+			cy.wrap(destination)
+				.should('have.property', 'title')
+				.and('eq', 'Test Destination');
+			cy.wrap(destination)
+				.should('have.property', 'tags')
+				.its('length')
+				.should('eq', 3);
+		});
+	});
+
 	it('updates a destination', () => {
 		const updateDestination = `mutation {
-			updateDestination(id: "${createdDestinationID}", user: "${createdUserID}", title: "Updated Destination Title", description: "Updated destination description") {
+			updateDestination(id: "${createdDestinationID}", user: "${createdUserID}", title: "Updated Destination Title", description: "Updated destination description", tags: ["Updated Destination Tag"]) {
 				title
 				description
 				user {
 					name
 				}
 				dateCreated
+				tags
 			}
 		}`;
 
@@ -465,6 +494,10 @@ describe('GraphQL Live Server:', () => {
 			cy.wrap(destination)
 				.should('have.property', 'description')
 				.should('eq', 'Updated destination description');
+			cy.wrap(destination)
+				.should('have.property', 'tags')
+				.its('length')
+				.should('eq', 1);
 		});
 	});
 
@@ -518,7 +551,7 @@ describe('GraphQL Live Server:', () => {
 			cy.wrap(destination)
 				.should('have.property', 'likedBy')
 				.its('length')
-				.should('be', 0);
+				.should('eq', 0);
 		});
 	});
 
@@ -698,7 +731,7 @@ describe('GraphQL Live Server:', () => {
 			cy.wrap(trip)
 				.should('have.property', 'likedBy')
 				.its('length')
-				.should('be', 0);
+				.should('eq', 0);
 		});
 	});
 
