@@ -37,4 +37,26 @@ module.exports = {
 			return item.save();
 		});
 	},
+	addPriceToAny: function(model, id, price) {
+		return model.findById(id).then(item => {
+			if (isNaN(price)) {
+				return new Error(
+					`User Entry Error: You must enter a valid number for price`
+				);
+			} else {
+				const prices = [...item.userPrices, price];
+				const sum = prices.reduce(
+					(previous, current) => (current += previous)
+				);
+				const average = sum / prices.length;
+				item.averagePrice = average;
+				const minimum = Math.min(...prices);
+				item.minimumPrice = minimum;
+				const maximum = Math.max(...prices);
+				item.maximumPrice = maximum;
+				item.userPrices.push(price);
+				return item.save();
+			}
+		});
+	},
 };

@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const { toggleAnyLike, updateAny, addTagsToAny } = require('./functions');
+const {
+	toggleAnyLike,
+	updateAny,
+	addTagsToAny,
+	addPriceToAny,
+} = require('./functions');
 
 const TransitSchema = new Schema({
 	name: { type: String, required: true },
@@ -33,6 +38,13 @@ const TransitSchema = new Schema({
 			type: String,
 		},
 	],
+	userPrices: {
+		type: Array,
+		default: [0.0],
+	},
+	averagePrice: { type: Number, default: 0.0 },
+	minimumPrice: { type: Number, default: 0.0 },
+	maximumPrice: { type: Number, default: 0.0 },
 	// Add a ote for users creating this that if a trip includes a few places to make multiple transits
 });
 
@@ -44,6 +56,10 @@ TransitSchema.statics.addTags = function(transitId, tags) {
 	return addTagsToAny(this, transitId, tags);
 };
 
+TransitSchema.statics.addPrice = function(transitId, price) {
+	return addPriceToAny(this, transitId, price);
+};
+
 TransitSchema.statics.update = function(transitId, userId, updateObject) {
 	return updateAny('transit', this, transitId, userId, updateObject, [
 		'name',
@@ -51,6 +67,10 @@ TransitSchema.statics.update = function(transitId, userId, updateObject) {
 		'startDestination',
 		'endDestination',
 		'tags',
+		'userPrices',
+		'averagePrice',
+		'maximumPrice',
+		'minimumPrice',
 	]);
 };
 
