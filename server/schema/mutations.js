@@ -295,6 +295,9 @@ const mutation = new GraphQLObjectType({
 				activities: {
 					type: new GraphQLList(GraphQLID),
 				},
+				tags: {
+					type: new GraphQLNonNull(new GraphQLList(GraphQLString)),
+				},
 			},
 			resolve(parentValue, args) {
 				return new Trip(args).save();
@@ -310,6 +313,18 @@ const mutation = new GraphQLObjectType({
 				return Trip.toggleLike(id, userId);
 			},
 		},
+		addTripTags: {
+			type: TripType,
+			args: {
+				id: { type: new GraphQLNonNull(GraphQLID) },
+				tags: {
+					type: new GraphQLNonNull(new GraphQLList(GraphQLString)),
+				},
+			},
+			resolve(parentValue, { id, tags }) {
+				return Trip.addTags(id, tags);
+			},
+		},
 		updateTrip: {
 			type: TripType,
 			args: {
@@ -320,6 +335,9 @@ const mutation = new GraphQLObjectType({
 				destinations: { type: new GraphQLList(GraphQLID) },
 				transits: { type: new GraphQLList(GraphQLID) },
 				activities: { type: new GraphQLList(GraphQLID) },
+				tags: {
+					type: new GraphQLList(GraphQLString),
+				},
 			},
 			resolve(
 				parentValue,
@@ -331,6 +349,7 @@ const mutation = new GraphQLObjectType({
 					destinations,
 					transits,
 					activities,
+					tags,
 				}
 			) {
 				return Trip.update(id, user, {
@@ -339,6 +358,7 @@ const mutation = new GraphQLObjectType({
 					destinations,
 					transits,
 					activities,
+					tags,
 				});
 			},
 		},
