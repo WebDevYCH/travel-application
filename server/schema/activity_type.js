@@ -50,6 +50,9 @@ const ActivityType = new GraphQLObjectType({
 					});
 			},
 		},
+		tags: {
+			type: new GraphQLList(GraphQLString),
+		},
 	}),
 });
 
