@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const { toggleAnyLike } = require('./functions');
+const { toggleAnyLike, updateAny, addTagsToAny } = require('./functions');
 
 const ActivitySchema = new Schema({
 	name: { type: String, required: true },
@@ -37,39 +37,17 @@ ActivitySchema.statics.toggleLike = function(activityId, userId) {
 };
 
 ActivitySchema.statics.addTags = function(activityId, tags) {
-	return this.findById(activityId).then(activity => {
-		const oldTags = activity.tags;
-		let newTags = oldTags.concat(tags); // tags must be an array
-		activity.tags = newTags;
-		return activity.save();
-	});
+	return addTagsToAny(this, activityId, tags);
 };
 
 ActivitySchema.statics.update = function(activityId, userId, updateObject) {
-	return this.findById(activityId).then(activity => {
-		if (activity.user == userId) {
-			if (updateObject.name) {
-				activity.name = updateObject.name;
-			}
-			if (updateObject.description) {
-				activity.description = updateObject.description;
-			}
-			if (updateObject.destination) {
-				activity.destination = updateObject.destination;
-			}
-			if (updateObject.address) {
-				activity.address = updateObject.address;
-			}
-			if (updateObject.tags) {
-				activity.tags = updateObject.tags;
-			}
-			return activity.save();
-		} else {
-			return new Error(
-				`User Authentication Error: You must be the user that created the activity to update it`
-			);
-		}
-	});
+	return updateAny('activity', this, activityId, userId, updateObject, [
+		'name',
+		'description',
+		'destination',
+		'address',
+		'tags',
+	]);
 };
 
 mongoose.model('activity', ActivitySchema);
