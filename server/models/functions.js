@@ -32,7 +32,8 @@ module.exports = {
 		return model.findById(id).then(item => {
 			const oldTags = item.tags;
 			let newTags = oldTags.concat(tags); // tags must be an array
-			item.tags = newTags;
+			let uniqueTags = [...new Set(newTags)]; // remove any duplicates from array
+			item.tags = uniqueTags;
 			return item.save();
 		});
 	},
