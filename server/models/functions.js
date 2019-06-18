@@ -11,4 +11,29 @@ module.exports = {
 			return item.save();
 		});
 	},
+	updateAny: function(modelName, model, id, userId, updateObject, fields) {
+		return model.findById(id).then(item => {
+			if (item.user == userId) {
+				fields.forEach(function(field) {
+					if (updateObject[field]) {
+						item[field] = updateObject[field];
+					}
+				});
+
+				return item.save();
+			} else {
+				return new Error(
+					`User Authentication Error: You must be the user that created the ${modelName} to update it`
+				);
+			}
+		});
+	},
+	addTagsToAny: function(model, id, tags) {
+		return model.findById(id).then(item => {
+			const oldTags = item.tags;
+			let newTags = oldTags.concat(tags); // tags must be an array
+			item.tags = newTags;
+			return item.save();
+		});
+	},
 };

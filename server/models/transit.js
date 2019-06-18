@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const { toggleAnyLike } = require('./functions');
+const { toggleAnyLike, updateAny } = require('./functions');
 
 const TransitSchema = new Schema({
 	name: { type: String, required: true },
@@ -36,27 +36,12 @@ TransitSchema.statics.toggleLike = function(transitId, userId) {
 };
 
 TransitSchema.statics.update = function(transitId, userId, updateObject) {
-	return this.findById(transitId).then(transit => {
-		if (transit.user == userId) {
-			if (updateObject.name) {
-				transit.name = updateObject.name;
-			}
-			if (updateObject.description) {
-				transit.description = updateObject.description;
-			}
-			if (updateObject.startDestination) {
-				transit.startDestination = updateObject.startDestination;
-			}
-			if (updateObject.endDestination) {
-				transit.endDestination = updateObject.endDestination;
-			}
-			return transit.save();
-		} else {
-			return new Error(
-				`User Authentication Error: You must be the user that created the transit to update it`
-			);
-		}
-	});
+	return updateAny('transit', this, transitId, userId, updateObject, [
+		'name',
+		'description',
+		'startDestination',
+		'endDestination',
+	]);
 };
 
 mongoose.model('transit', TransitSchema);

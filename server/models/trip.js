@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const { toggleAnyLike } = require('./functions');
+const { toggleAnyLike, updateAny } = require('./functions');
 
 const TripSchema = new Schema({
 	name: { type: String, required: true },
@@ -45,30 +45,13 @@ TripSchema.statics.toggleLike = function(tripId, userId) {
 };
 
 TripSchema.statics.update = function(tripId, userId, updateObject) {
-	return this.findById(tripId).then(trip => {
-		if (trip.user == userId) {
-			if (updateObject.name) {
-				trip.name = updateObject.name;
-			}
-			if (updateObject.description) {
-				trip.description = updateObject.description;
-			}
-			if (updateObject.destinations) {
-				trip.destination = updateObject.destinations;
-			}
-			if (updateObject.transits) {
-				trip.address = updateObject.transits;
-			}
-			if (updateObject.activities) {
-				trip.address = updateObject.activities;
-			}
-			return trip.save();
-		} else {
-			return new Error(
-				`User Authentication Error: You must be the user that created the trip to update it`
-			);
-		}
-	});
+	return updateAny('trip', this, tripId, userId, updateObject, [
+		'name',
+		'description',
+		'destinations',
+		'transits',
+		'activities',
+	]);
 };
 
 mongoose.model('trip', TripSchema);
