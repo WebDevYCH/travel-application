@@ -138,6 +138,9 @@ const mutation = new GraphQLObjectType({
 				user: { type: new GraphQLNonNull(GraphQLID) },
 				destination: { type: new GraphQLNonNull(GraphQLID) },
 				address: { type: GraphQLString },
+				tags: {
+					type: new GraphQLNonNull(new GraphQLList(GraphQLString)),
+				},
 			},
 			resolve(parentValue, args) {
 				return new Activity(args).save();
@@ -153,6 +156,18 @@ const mutation = new GraphQLObjectType({
 				return Activity.toggleLike(id, userId);
 			},
 		},
+		addActivityTags: {
+			type: ActivityType,
+			args: {
+				id: { type: new GraphQLNonNull(GraphQLID) },
+				tags: {
+					type: new GraphQLNonNull(new GraphQLList(GraphQLString)),
+				},
+			},
+			resolve(parentValue, { id, tags }) {
+				return Activity.addTags(id, tags);
+			},
+		},
 		updateActivity: {
 			type: ActivityType,
 			args: {
@@ -162,16 +177,20 @@ const mutation = new GraphQLObjectType({
 				user: { type: new GraphQLNonNull(GraphQLID) },
 				destination: { type: GraphQLID },
 				address: { type: GraphQLString },
+				tags: {
+					type: new GraphQLList(GraphQLString),
+				},
 			},
 			resolve(
 				parentValue,
-				{ id, user, name, description, destination, address }
+				{ id, user, name, description, destination, address, tags }
 			) {
 				return Activity.update(id, user, {
 					name,
 					description,
 					destination,
 					address,
+					tags,
 				});
 			},
 		},
