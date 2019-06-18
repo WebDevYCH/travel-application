@@ -17,6 +17,11 @@ const DestinationSchema = new Schema({
 			ref: 'user',
 		},
 	],
+	tags: [
+		{
+			type: String,
+		},
+	],
 });
 
 DestinationSchema.statics.toggleLike = function(destinationId, userId) {
@@ -30,6 +35,15 @@ DestinationSchema.statics.toggleLike = function(destinationId, userId) {
 			return destination.save();
 		}
 		array.push(userId);
+		return destination.save();
+	});
+};
+
+DestinationSchema.statics.addTags = function(destinationId, tags) {
+	return this.findById(destinationId).then(destination => {
+		const oldTags = destination.tags;
+		let newTags = oldTags.concat(tags); // tags must be an array
+		destination.tags = newTags;
 		return destination.save();
 	});
 };
@@ -48,7 +62,10 @@ DestinationSchema.statics.update = function(
 				destination.description = updateObject.description;
 			}
 			if (updateObject.climate) {
-				destination.description = updateObject.climate;
+				destination.climate = updateObject.climate;
+			}
+			if (updateObject.tags) {
+				destination.tags = updateObject.tags;
 			}
 			return destination.save();
 		} else {
