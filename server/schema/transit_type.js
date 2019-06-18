@@ -5,7 +5,7 @@ const {
 	GraphQLString,
 	GraphQLID,
 	GraphQLList,
-	GraphQLInt,
+	GraphQLFloat,
 } = graphql;
 const Transit = mongoose.model('transit');
 
@@ -59,6 +59,12 @@ const TransitType = new GraphQLObjectType({
 		tags: {
 			type: new GraphQLList(GraphQLString),
 		},
+		userPrices: {
+			type: new GraphQLList(GraphQLFloat),
+		},
+		averagePrice: { type: GraphQLFloat },
+		minimumPrice: { type: GraphQLFloat },
+		maximumPrice: { type: GraphQLFloat },
 	}),
 });
 
