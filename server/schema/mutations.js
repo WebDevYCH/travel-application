@@ -5,6 +5,7 @@ const {
 	GraphQLID,
 	GraphQLNonNull,
 	GraphQLList,
+	GraphQLFloat,
 } = graphql;
 const mongoose = require('mongoose');
 
@@ -212,6 +213,12 @@ const mutation = new GraphQLObjectType({
 				tags: {
 					type: new GraphQLNonNull(new GraphQLList(GraphQLString)),
 				},
+				userPrices: {
+					type: new GraphQLList(GraphQLFloat),
+				},
+				averagePrice: { type: GraphQLFloat },
+				minimumPrice: { type: GraphQLFloat },
+				maximumPrice: { type: GraphQLFloat },
 			},
 			resolve(parentValue, args) {
 				return new Transit(args).save();
@@ -239,6 +246,16 @@ const mutation = new GraphQLObjectType({
 				return Transit.addTags(id, tags);
 			},
 		},
+		addTransitPrice: {
+			type: TransitType,
+			args: {
+				id: { type: new GraphQLNonNull(GraphQLID) },
+				price: { type: GraphQLFloat },
+			},
+			resolve(parentValue, { id, price }) {
+				return Transit.addPrice(id, price);
+			},
+		},
 		updateTransit: {
 			type: TransitType,
 			args: {
@@ -251,6 +268,12 @@ const mutation = new GraphQLObjectType({
 				tags: {
 					type: new GraphQLList(GraphQLString),
 				},
+				userPrices: {
+					type: new GraphQLList(GraphQLFloat),
+				},
+				averagePrice: { type: GraphQLFloat },
+				minimumPrice: { type: GraphQLFloat },
+				maximumPrice: { type: GraphQLFloat },
 			},
 			resolve(
 				parentValue,
@@ -262,6 +285,10 @@ const mutation = new GraphQLObjectType({
 					startDestination,
 					endDestination,
 					tags,
+					userPrices,
+					averagePrice,
+					maximumPrice,
+					minimumPrice,
 				}
 			) {
 				return Transit.update(id, user, {
@@ -270,6 +297,10 @@ const mutation = new GraphQLObjectType({
 					startDestination,
 					endDestination,
 					tags,
+					userPrices,
+					averagePrice,
+					maximumPrice,
+					minimumPrice,
 				});
 			},
 		},

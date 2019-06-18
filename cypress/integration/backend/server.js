@@ -178,7 +178,7 @@ describe('GraphQL Live Server:', () => {
 
 	it('adds a transit', () => {
 		const addTransitQuery = `mutation {
-			addTransit(name: "Test Transit", description: "Test Transit Description", user: "${createdUserID}", startDestination: "${createdDestinationID}", endDestination: "${createdDestinationID2}", tags: ["Transit One Tag" , "Boring"]) {
+			addTransit(name: "Test Transit", description: "Test Transit Description", user: "${createdUserID}", startDestination: "${createdDestinationID}", endDestination: "${createdDestinationID2}", tags: ["Transit One Tag" , "Boring"], userPrices: [1700.1], averagePrice: 1700.1, minimumPrice: 1700.1, maximumPrice: 1700.1) {
 				id
 				name
 				description
@@ -195,6 +195,10 @@ describe('GraphQL Live Server:', () => {
 					description
 				}
 				tags
+				userPrices
+				averagePrice
+				minimumPrice
+				maximumPrice
 			}
 		}`;
 
@@ -703,9 +707,44 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	it('adds price to transit', () => {
+		const addTransitPrice = `mutation {
+			addTransitPrice(id: "${createdTransitID}", price: 1000.45) {
+				name
+				userPrices
+				averagePrice
+				minimumPrice
+				maximumPrice
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: addTransitPrice },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const transit = res.body.data.addTransitPrice;
+			cy.wrap(transit)
+				.should('have.property', 'minimumPrice')
+				.should('eq', 1000.45);
+			cy.wrap(transit)
+				.should('have.property', 'maximumPrice')
+				.should('eq', 1700.1);
+			cy.wrap(transit)
+				.should('have.property', 'averagePrice')
+				.should('eq', 1350.275);
+			cy.wrap(transit)
+				.should('have.property', 'userPrices')
+				.its('length')
+				.should('eq', 2);
+		});
+	});
+
 	it('updates a transit', () => {
 		const updateTransit = `mutation {
-			updateTransit(id: "${createdTransitID}", user: "${createdUserID}", name: "Updated Transit Name", description: "Updated Transit Description", startDestination: "${createdDestinationID2}", endDestination: "${createdDestinationID}") {
+			updateTransit(id: "${createdTransitID}", user: "${createdUserID}", name: "Updated Transit Name", description: "Updated Transit Description", startDestination: "${createdDestinationID2}", endDestination: "${createdDestinationID}", userPrices: [1800.1], averagePrice: 1800.1, minimumPrice: 1800.1, maximumPrice: 1800.1) {
 				name
 				description
 				startDestination {
@@ -719,6 +758,10 @@ describe('GraphQL Live Server:', () => {
 				user {
 					name
 				}
+				userPrices
+				averagePrice
+				maximumPrice
+				minimumPrice
 			}
 		}`;
 
