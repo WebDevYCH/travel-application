@@ -66,6 +66,9 @@ const TripType = new GraphQLObjectType({
 					});
 			},
 		},
+		tags: {
+			type: new GraphQLList(GraphQLString),
+		},
 	}),
 });
 
