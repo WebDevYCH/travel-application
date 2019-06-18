@@ -212,7 +212,7 @@ describe('GraphQL Live Server:', () => {
 
 	it('adds a trip', () => {
 		const addTrip = `mutation {
-			addTrip(name: "Test Trip", description: "Test Trip Description", user: "${createdUserID}", destinations: ["${createdDestinationID}", "${createdDestinationID2}"], transits: ["${createdTransitID}"], activities: ["${createdActivityID}"]) {
+			addTrip(name: "Test Trip", description: "Test Trip Description", user: "${createdUserID}", destinations: ["${createdDestinationID}", "${createdDestinationID2}"], transits: ["${createdTransitID}"], activities: ["${createdActivityID}"], tags: ["Trip Tag", "Super Duper Fun"]) {
 				id
 				name
 				description
@@ -233,6 +233,7 @@ describe('GraphQL Live Server:', () => {
 					name
 					description
 				}
+				tags
 			}
 		}`;
 
@@ -263,6 +264,10 @@ describe('GraphQL Live Server:', () => {
 				.should('have.property', 'activities')
 				.its('length')
 				.should('be', 1);
+			cy.wrap(trip)
+				.should('have.property', 'tags')
+				.its('length')
+				.should('be', 2);
 		});
 	});
 
@@ -788,14 +793,38 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	it('adds tags to a trip', () => {
+		const addTagsToTrip = `mutation {
+			addTripTags(id: "${createdTripID}", tags: ["Added Trip Tag"]) {
+				name
+				tags
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: addTagsToTrip },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const trip = res.body.data.addTripTags;
+			cy.wrap(trip)
+				.should('have.property', 'tags')
+				.its('length')
+				.should('eq', 3);
+		});
+	});
+
 	it('updates a trip', () => {
 		const updateTrip = `mutation {
-			updateTrip(id: "${createdTripID}", user: "${createdUserID}", name: "Updated Trip Name", description: "Updated Trip Description", destinations: ["${createdDestinationID2}", "${createdDestinationID}"], transits: ["${createdTransitID}"], activities: ["${createdActivityID}"]) {
+			updateTrip(id: "${createdTripID}", user: "${createdUserID}", name: "Updated Trip Name", description: "Updated Trip Description", destinations: ["${createdDestinationID2}", "${createdDestinationID}"], transits: ["${createdTransitID}"], activities: ["${createdActivityID}"], tags: ["Updated Trip Tag"]) {
 				name
 				description
 				user {
 					name
 				}
+				tags
 			}
 		}`;
 
@@ -813,6 +842,10 @@ describe('GraphQL Live Server:', () => {
 			cy.wrap(trip)
 				.should('have.property', 'description')
 				.should('eq', 'Updated Trip Description');
+			cy.wrap(trip)
+				.should('have.property', 'tags')
+				.its('length')
+				.should('eq', 1);
 		});
 	});
 
