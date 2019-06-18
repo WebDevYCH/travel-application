@@ -675,9 +675,9 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
-	it('adds tags to a transit', () => {
+	it('adds tags to a transit & ignores duplicate', () => {
 		const addTagsToTransit = `mutation {
-			addTransitTags(id: "${createdTransitID}", tags: ["Added Activity Tag"]) {
+			addTransitTags(id: "${createdTransitID}", tags: ["Added Activity Tag", "Boring"]) {
 				name
 				tags
 			}
