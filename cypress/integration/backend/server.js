@@ -147,7 +147,7 @@ describe('GraphQL Live Server:', () => {
 
 	it('adds an activity', () => {
 		const addActivityQuery = `mutation {
-			addActivity(name: "Test activity", description: "This is a test activity", user: "${createdUserID}", destination: "${createdDestinationID}", address: "Test Address", tags: ["First Activity Tag", "Blah"]) {
+			addActivity(name: "Test activity", description: "This is a test activity", user: "${createdUserID}", destination: "${createdDestinationID}", address: "Test Address", tags: ["First Activity Tag", "Blah"], userPrices: [1700.1], averagePrice: 1700.1, minimumPrice: 1700.1, maximumPrice: 1700.1) {
 				id
 				name
 				description
@@ -161,6 +161,10 @@ describe('GraphQL Live Server:', () => {
 					climate
 				}
 				tags
+				userPrices
+				averagePrice
+				minimumPrice
+				maximumPrice
 			}
 		}`;
 
@@ -589,9 +593,43 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	it('adds price to activity', () => {
+		const addActivityPrice = `mutation {
+			addActivityPrice(id: "${createdActivityID}", price: 1000.45) {
+				name
+				userPrices
+				averagePrice
+				minimumPrice
+				maximumPrice
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: addActivityPrice },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const activity = res.body.data.addActivityPrice;
+			cy.wrap(activity)
+				.should('have.property', 'minimumPrice')
+				.should('eq', 1000.45);
+			cy.wrap(activity)
+				.should('have.property', 'maximumPrice')
+				.should('eq', 1700.1);
+			cy.wrap(activity)
+				.should('have.property', 'averagePrice')
+				.should('eq', 1350.275);
+			cy.wrap(activity)
+				.should('have.property', 'userPrices')
+				.its('length')
+				.should('eq', 2);
+		});
+	});
 	it('updates an activity', () => {
 		const updateActivity = `mutation {
-			updateActivity(id: "${createdActivityID}", user: "${createdUserID}", name: "Updated Activity Name", description: "Updated Activity Description", address: "Updated Activity Address, 01945", tags: ["Updated Activity Tag"]) {
+			updateActivity(id: "${createdActivityID}", user: "${createdUserID}", name: "Updated Activity Name", description: "Updated Activity Description", address: "Updated Activity Address, 01945", tags: ["Updated Activity Tag"], userPrices: [1800.1], averagePrice: 1800.1, minimumPrice: 1800.1, maximumPrice: 1800.1) {
 				id
 				name
 				description
@@ -603,6 +641,10 @@ describe('GraphQL Live Server:', () => {
 				}
 				address
 				tags
+				userPrices
+				averagePrice
+				minimumPrice
+				maximumPrice
 			}
 		}`;
 

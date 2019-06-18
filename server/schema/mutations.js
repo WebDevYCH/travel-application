@@ -142,6 +142,12 @@ const mutation = new GraphQLObjectType({
 				tags: {
 					type: new GraphQLNonNull(new GraphQLList(GraphQLString)),
 				},
+				userPrices: {
+					type: new GraphQLList(GraphQLFloat),
+				},
+				averagePrice: { type: GraphQLFloat },
+				minimumPrice: { type: GraphQLFloat },
+				maximumPrice: { type: GraphQLFloat },
 			},
 			resolve(parentValue, args) {
 				return new Activity(args).save();
@@ -169,6 +175,16 @@ const mutation = new GraphQLObjectType({
 				return Activity.addTags(id, tags);
 			},
 		},
+		addActivityPrice: {
+			type: ActivityType,
+			args: {
+				id: { type: new GraphQLNonNull(GraphQLID) },
+				price: { type: GraphQLFloat },
+			},
+			resolve(parentValue, { id, price }) {
+				return Activity.addPrice(id, price);
+			},
+		},
 		updateActivity: {
 			type: ActivityType,
 			args: {
@@ -181,10 +197,28 @@ const mutation = new GraphQLObjectType({
 				tags: {
 					type: new GraphQLList(GraphQLString),
 				},
+				userPrices: {
+					type: new GraphQLList(GraphQLFloat),
+				},
+				averagePrice: { type: GraphQLFloat },
+				minimumPrice: { type: GraphQLFloat },
+				maximumPrice: { type: GraphQLFloat },
 			},
 			resolve(
 				parentValue,
-				{ id, user, name, description, destination, address, tags }
+				{
+					id,
+					user,
+					name,
+					description,
+					destination,
+					address,
+					tags,
+					userPrices,
+					averagePrice,
+					maximumPrice,
+					minimumPrice,
+				}
 			) {
 				return Activity.update(id, user, {
 					name,
@@ -192,6 +226,10 @@ const mutation = new GraphQLObjectType({
 					destination,
 					address,
 					tags,
+					userPrices,
+					averagePrice,
+					maximumPrice,
+					minimumPrice,
 				});
 			},
 		},

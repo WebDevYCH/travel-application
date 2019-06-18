@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const { toggleAnyLike, updateAny, addTagsToAny } = require('./functions');
+const {
+	toggleAnyLike,
+	updateAny,
+	addTagsToAny,
+	addPriceToAny,
+} = require('./functions');
 
 const ActivitySchema = new Schema({
 	name: { type: String, required: true },
@@ -30,6 +35,13 @@ const ActivitySchema = new Schema({
 			type: String,
 		},
 	],
+	userPrices: {
+		type: Array,
+		default: [0.0],
+	},
+	averagePrice: { type: Number, default: 0.0 },
+	minimumPrice: { type: Number, default: 0.0 },
+	maximumPrice: { type: Number, default: 0.0 },
 });
 
 ActivitySchema.statics.toggleLike = function(activityId, userId) {
@@ -38,6 +50,10 @@ ActivitySchema.statics.toggleLike = function(activityId, userId) {
 
 ActivitySchema.statics.addTags = function(activityId, tags) {
 	return addTagsToAny(this, activityId, tags);
+};
+
+ActivitySchema.statics.addPrice = function(activityId, price) {
+	return addPriceToAny(this, activityId, price);
 };
 
 ActivitySchema.statics.update = function(activityId, userId, updateObject) {
