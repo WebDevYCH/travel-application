@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const { toggleAnyLike } = require('./functions');
+
 const TransitSchema = new Schema({
 	name: { type: String, required: true },
 	description: { type: String, required: true },
@@ -30,18 +32,7 @@ const TransitSchema = new Schema({
 });
 
 TransitSchema.statics.toggleLike = function(transitId, userId) {
-	const User = mongoose.model('user');
-
-	return this.findById(transitId).then(transit => {
-		const array = transit.likedBy;
-		if (array.indexOf(userId) > -1) {
-			const index = array.indexOf(userId);
-			array.splice(index, 1);
-			return transit.save();
-		}
-		array.push(userId);
-		return transit.save();
-	});
+	return toggleAnyLike(this, transitId, userId);
 };
 
 TransitSchema.statics.update = function(transitId, userId, updateObject) {
