@@ -147,7 +147,7 @@ describe('GraphQL Live Server:', () => {
 
 	it('adds an activity', () => {
 		const addActivityQuery = `mutation {
-			addActivity(name: "Test activity", description: "This is a test activity", user: "${createdUserID}", destination: "${createdDestinationID}", address: "Test Address") {
+			addActivity(name: "Test activity", description: "This is a test activity", user: "${createdUserID}", destination: "${createdDestinationID}", address: "Test Address", tags: ["First Activity Tag", "Blah"]) {
 				id
 				name
 				description
@@ -160,6 +160,7 @@ describe('GraphQL Live Server:', () => {
 					description
 					climate
 				}
+				tags
 			}
 		}`;
 
@@ -555,9 +556,32 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
+	it('adds tags to a activity', () => {
+		const addTagsToActivity = `mutation {
+			addActivityTags(id: "${createdActivityID}", tags: ["Added Activity Tag"]) {
+				name
+				tags
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: addTagsToActivity },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const activity = res.body.data.addActivityTags;
+			cy.wrap(activity)
+				.should('have.property', 'tags')
+				.its('length')
+				.should('eq', 3);
+		});
+	});
+
 	it('updates an activity', () => {
 		const updateActivity = `mutation {
-			updateActivity(id: "${createdActivityID}", user: "${createdUserID}", name: "Updated Activity Name", description: "Updated Activity Description", address: "Updated Activity Address, 01945") {
+			updateActivity(id: "${createdActivityID}", user: "${createdUserID}", name: "Updated Activity Name", description: "Updated Activity Description", address: "Updated Activity Address, 01945", tags: ["Updated Activity Tag"]) {
 				id
 				name
 				description
@@ -568,6 +592,7 @@ describe('GraphQL Live Server:', () => {
 					title
 				}
 				address
+				tags
 			}
 		}`;
 
@@ -588,6 +613,10 @@ describe('GraphQL Live Server:', () => {
 			cy.wrap(activity)
 				.should('have.property', 'address')
 				.should('eq', 'Updated Activity Address, 01945');
+			cy.wrap(activity)
+				.should('have.property', 'tags')
+				.its('length')
+				.should('eq', 1);
 		});
 	});
 
