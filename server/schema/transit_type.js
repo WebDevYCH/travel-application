@@ -56,6 +56,9 @@ const TransitType = new GraphQLObjectType({
 					});
 			},
 		},
+		tags: {
+			type: new GraphQLList(GraphQLString),
+		},
 	}),
 });
 
