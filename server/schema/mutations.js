@@ -67,6 +67,7 @@ const mutation = new GraphQLObjectType({
 			args: {
 				title: { type: new GraphQLNonNull(GraphQLString) },
 				description: { type: new GraphQLNonNull(GraphQLString) },
+				climate: { type: new GraphQLNonNull(GraphQLString) },
 				user: { type: new GraphQLNonNull(GraphQLID) },
 			},
 			resolve(parentValue, args) {
@@ -79,12 +80,14 @@ const mutation = new GraphQLObjectType({
 				id: { type: new GraphQLNonNull(GraphQLID) },
 				title: { type: GraphQLString },
 				description: { type: GraphQLString },
+				climate: { type: GraphQLString },
 				user: { type: new GraphQLNonNull(GraphQLID) },
 			},
-			resolve(parentValue, { id, user, title, description }) {
+			resolve(parentValue, { id, user, title, description, climate }) {
 				return Destination.update(id, user, {
 					title,
 					description,
+					climate,
 				});
 			},
 		},

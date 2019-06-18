@@ -71,7 +71,7 @@ describe('GraphQL Live Server:', () => {
 
 	it('adds a destination', () => {
 		const addDestinationQuery = `mutation {
-			addDestination(title: "Test Destination", description: "It is a test. It is awesome if it works", user: "${createdUserID}") {
+			addDestination(title: "Test Destination", description: "It is a test. It is awesome if it works", user: "${createdUserID}", climate: "cold") {
 				id
 				title
 				user {
@@ -80,6 +80,7 @@ describe('GraphQL Live Server:', () => {
 					email
 				}
 				description
+				climate
 			}
 		}`;
 
@@ -98,13 +99,16 @@ describe('GraphQL Live Server:', () => {
 			cy.wrap(destinationData)
 				.should('have.property', 'description')
 				.and('eq', 'It is a test. It is awesome if it works');
+			cy.wrap(destinationData)
+				.should('have.property', 'climate')
+				.and('eq', 'cold');
 			cy.wrap(destinationData).should('have.property', 'user');
 		});
 	});
 
 	it('adds a second destination', () => {
 		const addDestinationQuery = `mutation {
-			addDestination(title: "Test Destination 2", description: "It is a test. It is awesome if it works", user: "${createdUserID}") {
+			addDestination(title: "Test Destination 2", description: "It is a test. It is awesome if it works", user: "${createdUserID}", climate: "warm") {
 				id
 				title
 				user {
@@ -113,6 +117,7 @@ describe('GraphQL Live Server:', () => {
 					email
 				}
 				description
+				climate
 			}
 		}`;
 
@@ -131,6 +136,9 @@ describe('GraphQL Live Server:', () => {
 			cy.wrap(destinationData)
 				.should('have.property', 'description')
 				.and('eq', 'It is a test. It is awesome if it works');
+			cy.wrap(destinationData)
+				.should('have.property', 'climate')
+				.and('eq', 'warm');
 			cy.wrap(destinationData).should('have.property', 'user');
 		});
 	});
@@ -148,6 +156,7 @@ describe('GraphQL Live Server:', () => {
 				destination {
 					title
 					description
+					climate
 				}
 			}
 		}`;
