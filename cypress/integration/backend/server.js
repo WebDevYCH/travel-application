@@ -178,7 +178,7 @@ describe('GraphQL Live Server:', () => {
 
 	it('adds a transit', () => {
 		const addTransitQuery = `mutation {
-			addTransit(name: "Test Transit", description: "Test Transit Description", user: "${createdUserID}", startDestination: "${createdDestinationID}", endDestination: "${createdDestinationID2}") {
+			addTransit(name: "Test Transit", description: "Test Transit Description", user: "${createdUserID}", startDestination: "${createdDestinationID}", endDestination: "${createdDestinationID2}", tags: ["Transit One Tag" , "Boring"]) {
 				id
 				name
 				description
@@ -194,6 +194,7 @@ describe('GraphQL Live Server:', () => {
 					title
 					description
 				}
+				tags
 			}
 		}`;
 
@@ -671,6 +672,29 @@ describe('GraphQL Live Server:', () => {
 				.should('have.property', 'likedBy')
 				.its('length')
 				.should('be', 0);
+		});
+	});
+
+	it('adds tags to a transit', () => {
+		const addTagsToTransit = `mutation {
+			addTransitTags(id: "${createdTransitID}", tags: ["Added Activity Tag"]) {
+				name
+				tags
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: addTagsToTransit },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const transit = res.body.data.addTransitTags;
+			cy.wrap(transit)
+				.should('have.property', 'tags')
+				.its('length')
+				.should('eq', 3);
 		});
 	});
 

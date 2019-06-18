@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const { toggleAnyLike, updateAny } = require('./functions');
+const { toggleAnyLike, updateAny, addTagsToAny } = require('./functions');
 
 const TransitSchema = new Schema({
 	name: { type: String, required: true },
@@ -28,11 +28,20 @@ const TransitSchema = new Schema({
 			ref: 'user',
 		},
 	],
+	tags: [
+		{
+			type: String,
+		},
+	],
 	// Add a ote for users creating this that if a trip includes a few places to make multiple transits
 });
 
 TransitSchema.statics.toggleLike = function(transitId, userId) {
 	return toggleAnyLike(this, transitId, userId);
+};
+
+TransitSchema.statics.addTags = function(transitId, tags) {
+	return addTagsToAny(this, transitId, tags);
 };
 
 TransitSchema.statics.update = function(transitId, userId, updateObject) {
@@ -41,6 +50,7 @@ TransitSchema.statics.update = function(transitId, userId, updateObject) {
 		'description',
 		'startDestination',
 		'endDestination',
+		'tags',
 	]);
 };
 
