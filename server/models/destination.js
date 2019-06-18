@@ -5,6 +5,7 @@ const DestinationSchema = new Schema({
 	title: { type: String, required: true },
 	dateCreated: { type: Date, default: Date.now },
 	description: { type: String, required: true },
+	climate: { type: String, required: true }, // Cold, Warm, Moderate, Seasonal - Saved lowercase
 	user: {
 		type: Schema.Types.ObjectId,
 		ref: 'user',
@@ -45,6 +46,9 @@ DestinationSchema.statics.update = function(
 			}
 			if (updateObject.description) {
 				destination.description = updateObject.description;
+			}
+			if (updateObject.climate) {
+				destination.description = updateObject.climate;
 			}
 			return destination.save();
 		} else {

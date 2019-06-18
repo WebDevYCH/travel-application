@@ -16,6 +16,7 @@ const DestinationType = new GraphQLObjectType({
 		title: { type: GraphQLString },
 		dateCreated: { type: GraphQLString },
 		description: { type: GraphQLString },
+		climate: { type: GraphQLString },
 		user: {
 			type: require('./user_type'),
 			resolve(parentValue) {
