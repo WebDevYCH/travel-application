@@ -39,6 +39,9 @@ const DestinationType = new GraphQLObjectType({
 					});
 			},
 		},
+		tags: {
+			type: new GraphQLList(GraphQLString),
+		},
 	}),
 });
 
