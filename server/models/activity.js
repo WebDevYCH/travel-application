@@ -23,6 +23,11 @@ const ActivitySchema = new Schema({
 			ref: 'user',
 		},
 	],
+	tags: [
+		{
+			type: String,
+		},
+	],
 });
 
 ActivitySchema.statics.toggleLike = function(activityId, userId) {
@@ -36,6 +41,15 @@ ActivitySchema.statics.toggleLike = function(activityId, userId) {
 			return activity.save();
 		}
 		array.push(userId);
+		return activity.save();
+	});
+};
+
+ActivitySchema.statics.addTags = function(activityId, tags) {
+	return this.findById(activityId).then(activity => {
+		const oldTags = activity.tags;
+		let newTags = oldTags.concat(tags); // tags must be an array
+		activity.tags = newTags;
 		return activity.save();
 	});
 };
@@ -54,6 +68,9 @@ ActivitySchema.statics.update = function(activityId, userId, updateObject) {
 			}
 			if (updateObject.address) {
 				activity.address = updateObject.address;
+			}
+			if (updateObject.tags) {
+				activity.tags = updateObject.tags;
 			}
 			return activity.save();
 		} else {
