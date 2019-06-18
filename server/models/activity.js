@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const { toggleAnyLike } = require('./functions');
+
 const ActivitySchema = new Schema({
 	name: { type: String, required: true },
 	description: { type: String, required: true },
@@ -31,18 +33,7 @@ const ActivitySchema = new Schema({
 });
 
 ActivitySchema.statics.toggleLike = function(activityId, userId) {
-	const User = mongoose.model('user');
-
-	return this.findById(activityId).then(activity => {
-		const array = activity.likedBy;
-		if (array.indexOf(userId) > -1) {
-			const index = array.indexOf(userId);
-			array.splice(index, 1);
-			return activity.save();
-		}
-		array.push(userId);
-		return activity.save();
-	});
+	return toggleAnyLike(this, activityId, userId);
 };
 
 ActivitySchema.statics.addTags = function(activityId, tags) {
