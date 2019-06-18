@@ -53,6 +53,12 @@ const ActivityType = new GraphQLObjectType({
 		tags: {
 			type: new GraphQLList(GraphQLString),
 		},
+		userPrices: {
+			type: new GraphQLList(GraphQLFloat),
+		},
+		averagePrice: { type: GraphQLFloat },
+		minimumPrice: { type: GraphQLFloat },
+		maximumPrice: { type: GraphQLFloat },
 	}),
 });
 
