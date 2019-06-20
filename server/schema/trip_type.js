@@ -69,6 +69,16 @@ const TripType = new GraphQLObjectType({
 		tags: {
 			type: new GraphQLList(GraphQLString),
 		},
+		comments: {
+			type: new GraphQLList(require('./comment_type')),
+			resolve(parentValue) {
+				return Trip.findById(parentValue)
+					.populate('comments')
+					.then(trip => {
+						return trip.comments;
+					});
+			},
+		},
 	}),
 });
 
