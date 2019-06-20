@@ -6,6 +6,8 @@ const {
 	updateAny,
 	addTagsToAny,
 	addPriceToAny,
+	commentOn,
+	deleteComment,
 } = require('./functions');
 
 const TransitSchema = new Schema({
@@ -45,11 +47,25 @@ const TransitSchema = new Schema({
 	averagePrice: { type: Number, default: 0.0 },
 	minimumPrice: { type: Number, default: 0.0 },
 	maximumPrice: { type: Number, default: 0.0 },
+	comments: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'comment',
+		},
+	],
 	// Add a ote for users creating this that if a trip includes a few places to make multiple transits
 });
 
 TransitSchema.statics.toggleLike = function(transitId, userId) {
 	return toggleAnyLike(this, transitId, userId);
+};
+
+TransitSchema.statics.comment = function(transitId, commentId) {
+	return commentOn(this, transitId, commentId);
+};
+
+TransitSchema.statics.uncomment = function(transitId, commentId) {
+	return deleteComment(this, transitId, commentId);
 };
 
 TransitSchema.statics.addTags = function(transitId, tags) {

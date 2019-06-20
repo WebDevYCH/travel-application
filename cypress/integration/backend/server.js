@@ -7,6 +7,8 @@ describe('GraphQL Live Server:', () => {
 	let createdTransitID;
 	let createdTripID;
 	let createdCommentID;
+	let createdCommentID2;
+	let createdCommentID3;
 
 	it('creates a user', () => {
 		const addUserQuery = `mutation {
@@ -400,7 +402,36 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
-	it('likes a destination', () => {
+	it('comments on a destination', () => {
+		const addComment = `mutation {
+			addComment(title: "It was a good destination", comment: "That is all there is to say", user: "${createdUserID}", modelName: "destination", modelId: "${createdDestinationID}") {
+				id
+				title
+				comment
+				user {
+					name
+					email
+				}
+				dateCreated
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: addComment },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const comment = res.body.data.addComment;
+			createdCommentID2 = comment.id;
+			cy.wrap(comment)
+				.should('have.property', 'title')
+				.should('eq', 'It was a good destination');
+		});
+	});
+
+	it('likes a destination & checks comments', () => {
 		const likeDestinationQuery = `mutation {
 			toggleDestinationLike(id: "${createdDestinationID}", userId: "${createdUserID}") {
 				title
@@ -408,6 +439,10 @@ describe('GraphQL Live Server:', () => {
 				  id
 				  name
 				  email
+				}
+				comments {
+					title
+					comment
 				}
 			  }
 		}`;
@@ -424,6 +459,28 @@ describe('GraphQL Live Server:', () => {
 				.should('have.property', 'likedBy')
 				.its('length')
 				.should('be.gt', 0);
+			cy.wrap(destination)
+				.should('have.property', 'comments')
+				.its('length')
+				.should('eq', 1);
+		});
+	});
+
+	it('deletes comment on an destination', () => {
+		const deleteComment = `mutation {
+			deleteComment(id: "${createdCommentID2}", modelName: "destination", modelId: "${createdDestinationID}") {
+				id
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: deleteComment },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const destination = res.body.data.deleteComment;
 		});
 	});
 
@@ -435,6 +492,10 @@ describe('GraphQL Live Server:', () => {
 				  id
 				  name
 				  email
+				}
+				comments {
+					title
+					comment
 				}
 			  }
 		}`;
@@ -452,6 +513,10 @@ describe('GraphQL Live Server:', () => {
 				.and('eq', 'Test Destination');
 			cy.wrap(destination)
 				.should('have.property', 'likedBy')
+				.its('length')
+				.should('be', 0);
+			cy.wrap(destination)
+				.should('have.property', 'comments')
 				.its('length')
 				.should('be', 0);
 		});
@@ -754,7 +819,36 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
-	it('likes a transit', () => {
+	it('comments on a transit', () => {
+		const addComment = `mutation {
+			addComment(title: "It was a good transit", comment: "That is all there is to say", user: "${createdUserID}", modelName: "transit", modelId: "${createdTransitID}") {
+				id
+				title
+				comment
+				user {
+					name
+					email
+				}
+				dateCreated
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: addComment },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const comment = res.body.data.addComment;
+			createdCommentID3 = comment.id;
+			cy.wrap(comment)
+				.should('have.property', 'title')
+				.should('eq', 'It was a good transit');
+		});
+	});
+
+	it('likes a transit & checks for comments', () => {
 		const toggleTransitLike = `mutation {
 			toggleTransitLike(id: "${createdTransitID}", userId: "${createdUserID}") {
 				name
@@ -762,6 +856,10 @@ describe('GraphQL Live Server:', () => {
 				  id
 				  name
 				  email
+				}
+				comments {
+					title
+					comment
 				}
 			  }
 		}`;
@@ -778,10 +876,32 @@ describe('GraphQL Live Server:', () => {
 				.should('have.property', 'likedBy')
 				.its('length')
 				.should('be.gt', 0);
+			cy.wrap(transit)
+				.should('have.property', 'comments')
+				.its('length')
+				.should('be', 1);
 		});
 	});
 
-	it('dislikes a transit', () => {
+	it('deletes comment on an transit', () => {
+		const deleteComment = `mutation {
+			deleteComment(id: "${createdCommentID3}", modelName: "trip", modelId: "${createdTransitID}") {
+				id
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: deleteComment },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const comment = res.body.data.deleteComment;
+		});
+	});
+
+	it('dislikes a transit & checks deleted comment', () => {
 		const toggleTransitLike = `mutation {
 			toggleTransitLike(id: "${createdTransitID}", userId: "${createdUserID}") {
 				name
@@ -789,6 +909,10 @@ describe('GraphQL Live Server:', () => {
 				  id
 				  name
 				  email
+				}
+				comments {
+					title
+					comment
 				}
 			  }
 		}`;
@@ -803,6 +927,10 @@ describe('GraphQL Live Server:', () => {
 			const transit = res.body.data.toggleTransitLike;
 			cy.wrap(transit)
 				.should('have.property', 'likedBy')
+				.its('length')
+				.should('be', 0);
+			cy.wrap(transit)
+				.should('have.property', 'comments')
 				.its('length')
 				.should('be', 0);
 		});
