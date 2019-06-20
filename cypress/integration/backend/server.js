@@ -6,6 +6,7 @@ describe('GraphQL Live Server:', () => {
 	let createdUserAtTime;
 	let createdTransitID;
 	let createdTripID;
+	let createdCommentID;
 
 	it('creates a user', () => {
 		const addUserQuery = `mutation {
@@ -627,7 +628,37 @@ describe('GraphQL Live Server:', () => {
 				.should('eq', 2);
 		});
 	});
-	it('updates an activity', () => {
+
+	it('comments on an activity', () => {
+		const addComment = `mutation {
+			addComment(title: "It was a good activity", comment: "That is all there is to say", user: "${createdUserID}", modelName: "activity", modelId: "${createdActivityID}") {
+				id
+				title
+				comment
+				user {
+					name
+					email
+				}
+				dateCreated
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: addComment },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const comment = res.body.data.addComment;
+			createdCommentID = comment.id;
+			cy.wrap(comment)
+				.should('have.property', 'title')
+				.should('eq', 'It was a good activity');
+		});
+	});
+
+	it('updates an activity & checks existence of comment', () => {
 		const updateActivity = `mutation {
 			updateActivity(id: "${createdActivityID}", user: "${createdUserID}", name: "Updated Activity Name", description: "Updated Activity Description", address: "Updated Activity Address, 01945", tags: ["Updated Activity Tag"], userPrices: [1800.1], averagePrice: 1800.1, minimumPrice: 1800.1, maximumPrice: 1800.1) {
 				id
@@ -645,6 +676,10 @@ describe('GraphQL Live Server:', () => {
 				averagePrice
 				minimumPrice
 				maximumPrice
+				comments {
+					title
+					comment
+				}
 			}
 		}`;
 
@@ -669,6 +704,53 @@ describe('GraphQL Live Server:', () => {
 				.should('have.property', 'tags')
 				.its('length')
 				.should('eq', 1);
+			cy.wrap(activity)
+				.should('have.property', 'comments')
+				.its('length')
+				.should('eq', 1);
+		});
+	});
+
+	it('deletes comment on an activity', () => {
+		const deleteComment = `mutation {
+			deleteComment(id: "${createdCommentID}", modelName: "activity", modelId: "${createdActivityID}") {
+				id
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: deleteComment },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const transit = res.body.data.deleteComment;
+		});
+	});
+
+	it('successfully has deleted comment', () => {
+		const findActivityByIdQuery = `{
+			activity(id: "${createdActivityID}") {
+				comments {
+					title
+					comment
+				}
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: findActivityByIdQuery },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const activity = res.body.data.activity;
+			cy.wrap(activity)
+				.should('have.property', 'comments')
+				.its('length')
+				.should('eq', 0);
 		});
 	});
 
