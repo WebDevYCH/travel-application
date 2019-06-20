@@ -22,7 +22,6 @@ const ActivityType = new GraphQLObjectType({
 				return Activity.findById(parentValue)
 					.populate('user')
 					.then(activity => {
-						// console.log(destination);
 						return activity.user;
 					});
 			},
@@ -45,7 +44,6 @@ const ActivityType = new GraphQLObjectType({
 				return Activity.findById(parentValue)
 					.populate('likedBy')
 					.then(activity => {
-						// console.log(destination);
 						return activity.likedBy;
 					});
 			},
@@ -59,6 +57,16 @@ const ActivityType = new GraphQLObjectType({
 		averagePrice: { type: GraphQLFloat },
 		minimumPrice: { type: GraphQLFloat },
 		maximumPrice: { type: GraphQLFloat },
+		comments: {
+			type: new GraphQLList(require('./comment_type')),
+			resolve(parentValue) {
+				return Activity.findById(parentValue)
+					.populate('comments')
+					.then(activity => {
+						return activity.comments;
+					});
+			},
+		},
 	}),
 });
 

@@ -11,6 +11,21 @@ module.exports = {
 			return item.save();
 		});
 	},
+	commentOn: function(model, id, commentId) {
+		return model.findById(id).then(item => {
+			const array = item.comments;
+			array.push(commentId);
+			return item.save();
+		});
+	},
+	deleteComment: function(model, id, commentId) {
+		return model.findById(id).then(item => {
+			const array = item.comments;
+			const index = array.indexOf(commentId);
+			array.splice(index, 1);
+			return item.save();
+		});
+	},
 	updateAny: function(modelName, model, id, userId, updateObject, fields) {
 		return model.findById(id).then(item => {
 			if (item.user == userId) {
