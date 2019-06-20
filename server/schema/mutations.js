@@ -15,12 +15,14 @@ const DestinationType = require('./destination_type');
 const ActivityType = require('./activity_type');
 const TransitType = require('./transit_type');
 const TripType = require('./trip_type');
+const CommentType = require('./comment_type');
 // Import Mongoose Model
 const User = mongoose.model('user');
 const Destination = mongoose.model('destination');
 const Activity = mongoose.model('activity');
 const Transit = mongoose.model('transit');
 const Trip = mongoose.model('trip');
+const Comment = mongoose.model('comment');
 
 const mutation = new GraphQLObjectType({
 	name: 'Mutation',
@@ -436,6 +438,60 @@ const mutation = new GraphQLObjectType({
 			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
 			resolve(parentValue, { id }) {
 				return Trip.deleteOne({ _id: id });
+			},
+		},
+		addComment: {
+			type: CommentType,
+			args: {
+				title: { type: new GraphQLNonNull(GraphQLString) },
+				comment: { type: new GraphQLNonNull(GraphQLString) },
+				user: { type: new GraphQLNonNull(GraphQLID) },
+				modelName: { type: new GraphQLNonNull(GraphQLString) },
+				modelId: { type: new GraphQLNonNull(GraphQLID) },
+			},
+			resolve(parentValue, args) {
+				return new Comment(args).save().then(comment => {
+					switch (args.modelName) {
+						case 'activity':
+							return Activity.comment(
+								args.modelId,
+								comment._id
+							).then(() => {
+								return comment;
+							});
+							break;
+						default:
+							return new Error(
+								'There was an error attaching comment'
+							);
+					}
+				});
+			},
+		},
+		deleteComment: {
+			type: CommentType,
+			args: {
+				id: { type: new GraphQLNonNull(GraphQLID) },
+				modelName: { type: new GraphQLNonNull(GraphQLString) },
+				modelId: { type: new GraphQLNonNull(GraphQLID) },
+			},
+			resolve(parentValue, { id }) {
+				return Comment.deleteOne({ _id: id }).then(comment => {
+					switch (args.modelName) {
+						case 'activity':
+							return Activity.uncomment(
+								args.modelId,
+								comment._id
+							).then(() => {
+								return comment;
+							});
+							break;
+						default:
+							return new Error(
+								'There was an error deleting comment'
+							);
+					}
+				});
 			},
 		},
 	},
