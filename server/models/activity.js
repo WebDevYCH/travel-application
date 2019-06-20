@@ -6,6 +6,8 @@ const {
 	updateAny,
 	addTagsToAny,
 	addPriceToAny,
+	commentOn,
+	deleteComment,
 } = require('./functions');
 
 const ActivitySchema = new Schema({
@@ -42,10 +44,24 @@ const ActivitySchema = new Schema({
 	averagePrice: { type: Number, default: 0.0 },
 	minimumPrice: { type: Number, default: 0.0 },
 	maximumPrice: { type: Number, default: 0.0 },
+	comments: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'comment',
+		},
+	],
 });
 
 ActivitySchema.statics.toggleLike = function(activityId, userId) {
 	return toggleAnyLike(this, activityId, userId);
+};
+
+ActivitySchema.statics.comment = function(activityId, commentId) {
+	return commentOn(this, activityId, commentId);
+};
+
+ActivitySchema.statics.uncomment = function(activityId, commentId) {
+	return deleteComment(this, activityId, commentId);
 };
 
 ActivitySchema.statics.addTags = function(activityId, tags) {
