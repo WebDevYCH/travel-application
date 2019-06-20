@@ -23,7 +23,6 @@ const DestinationType = new GraphQLObjectType({
 				return Destination.findById(parentValue)
 					.populate('user')
 					.then(destination => {
-						// console.log(destination);
 						return destination.user;
 					});
 			},
@@ -34,13 +33,22 @@ const DestinationType = new GraphQLObjectType({
 				return Destination.findById(parentValue)
 					.populate('likedBy')
 					.then(destination => {
-						// console.log(destination);
 						return destination.likedBy;
 					});
 			},
 		},
 		tags: {
 			type: new GraphQLList(GraphQLString),
+		},
+		comments: {
+			type: new GraphQLList(require('./comment_type')),
+			resolve(parentValue) {
+				return Destination.findById(parentValue)
+					.populate('comments')
+					.then(destination => {
+						return destination.comments;
+					});
+			},
 		},
 	}),
 });
