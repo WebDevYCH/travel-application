@@ -906,7 +906,36 @@ describe('GraphQL Live Server:', () => {
 		});
 	});
 
-	it('likes a trip', () => {
+	it('comments on a trip', () => {
+		const addComment = `mutation {
+			addComment(title: "It was a good trip", comment: "That is all there is to say", user: "${createdUserID}", modelName: "trip", modelId: "${createdTripID}") {
+				id
+				title
+				comment
+				user {
+					name
+					email
+				}
+				dateCreated
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: addComment },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const comment = res.body.data.addComment;
+			createdCommentID = comment.id;
+			cy.wrap(comment)
+				.should('have.property', 'title')
+				.should('eq', 'It was a good trip');
+		});
+	});
+
+	it('likes a trip & has comments', () => {
 		const toggleTripLike = `mutation {
 			toggleTripLike(id: "${createdTripID}", userId: "${createdUserID}") {
 				name
@@ -914,6 +943,10 @@ describe('GraphQL Live Server:', () => {
 				  id
 				  name
 				  email
+				}
+				comments {
+					title
+					comment
 				}
 			  }
 		}`;
@@ -930,10 +963,32 @@ describe('GraphQL Live Server:', () => {
 				.should('have.property', 'likedBy')
 				.its('length')
 				.should('be.gt', 0);
+			cy.wrap(trip)
+				.should('have.property', 'comments')
+				.its('length')
+				.should('be', 1);
 		});
 	});
 
-	it('dislikes a trip', () => {
+	it('deletes comment on an trip', () => {
+		const deleteComment = `mutation {
+			deleteComment(id: "${createdCommentID}", modelName: "trip", modelId: "${createdTripID}") {
+				id
+			}
+		}`;
+
+		cy.request({
+			url: '/graphql',
+			method: 'POST',
+			body: { query: deleteComment },
+			failOnStatusCode: false,
+		}).then(res => {
+			cy.log(res);
+			const comment = res.body.data.deleteComment;
+		});
+	});
+
+	it('dislikes a trip & shows no comments', () => {
 		const toggleTripLike = `mutation {
 			toggleTripLike(id: "${createdTripID}", userId: "${createdUserID}") {
 				name
@@ -941,6 +996,10 @@ describe('GraphQL Live Server:', () => {
 				  id
 				  name
 				  email
+				}
+				comments {
+					title
+					comment
 				}
 			  }
 		}`;
@@ -955,6 +1014,10 @@ describe('GraphQL Live Server:', () => {
 			const trip = res.body.data.toggleTripLike;
 			cy.wrap(trip)
 				.should('have.property', 'likedBy')
+				.its('length')
+				.should('eq', 0);
+			cy.wrap(trip)
+				.should('have.property', 'comments')
 				.its('length')
 				.should('eq', 0);
 		});

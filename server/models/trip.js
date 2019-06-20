@@ -1,7 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const { toggleAnyLike, updateAny, addTagsToAny } = require('./functions');
+const {
+	toggleAnyLike,
+	updateAny,
+	addTagsToAny,
+	commentOn,
+	deleteComment,
+} = require('./functions');
 
 const TripSchema = new Schema({
 	name: { type: String, required: true },
@@ -43,10 +49,24 @@ const TripSchema = new Schema({
 			type: String,
 		},
 	],
+	comments: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'comment',
+		},
+	],
 });
 
 TripSchema.statics.toggleLike = function(tripId, userId) {
 	return toggleAnyLike(this, tripId, userId);
+};
+
+TripSchema.statics.comment = function(tripId, commentId) {
+	return commentOn(this, tripId, commentId);
+};
+
+TripSchema.statics.uncomment = function(tripId, commentId) {
+	return deleteComment(this, tripId, commentId);
 };
 
 TripSchema.statics.addTags = function(tripId, tags) {

@@ -460,6 +460,13 @@ const mutation = new GraphQLObjectType({
 								return comment;
 							});
 							break;
+						case 'trip':
+							return Trip.comment(args.modelId, comment._id).then(
+								() => {
+									return comment;
+								}
+							);
+							break;
 						default:
 							return new Error(
 								'There was an error attaching comment'
@@ -480,6 +487,14 @@ const mutation = new GraphQLObjectType({
 					switch (args.modelName) {
 						case 'activity':
 							return Activity.uncomment(
+								args.modelId,
+								comment._id
+							).then(() => {
+								return comment;
+							});
+							break;
+						case 'trip':
+							return Trip.uncomment(
 								args.modelId,
 								comment._id
 							).then(() => {
