@@ -65,6 +65,16 @@ const TransitType = new GraphQLObjectType({
 		averagePrice: { type: GraphQLFloat },
 		minimumPrice: { type: GraphQLFloat },
 		maximumPrice: { type: GraphQLFloat },
+		comments: {
+			type: new GraphQLList(require('./comment_type')),
+			resolve(parentValue) {
+				return Transit.findById(parentValue)
+					.populate('comments')
+					.then(transit => {
+						return transit.comments;
+					});
+			},
+		},
 	}),
 });
 

@@ -1,7 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const { toggleAnyLike, updateAny, addTagsToAny } = require('./functions');
+const {
+	toggleAnyLike,
+	updateAny,
+	addTagsToAny,
+	commentOn,
+	deleteComment,
+} = require('./functions');
 
 const DestinationSchema = new Schema({
 	title: { type: String, required: true },
@@ -24,10 +30,24 @@ const DestinationSchema = new Schema({
 			type: String,
 		},
 	],
+	comments: [
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'comment',
+		},
+	],
 });
 
 DestinationSchema.statics.toggleLike = function(destinationId, userId) {
 	return toggleAnyLike(this, destinationId, userId);
+};
+
+DestinationSchema.statics.comment = function(destinationId, commentId) {
+	return commentOn(this, destinationId, commentId);
+};
+
+DestinationSchema.statics.uncomment = function(destinationId, commentId) {
+	return deleteComment(this, destinationId, commentId);
 };
 
 DestinationSchema.statics.addTags = function(destinationId, tags) {
