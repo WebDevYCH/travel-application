@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const fileUpload = require('express-fileupload');
 const cloudFiles = require('cloudinary').v2;
 const cookieParser = require('cookie-parser');
+var jwt = require('jsonwebtoken');
 //=====================================================
 
 const app = express();
@@ -39,29 +40,84 @@ mongoose.connection
 // Checks if user has a JWT Token - Hypothetically
 app.use((req, res, next) => {
 	// If there is a user token
-	if (req.cookies.user) {
-		req.authCookie = true;
+	if (req.cookies['access-token']) {
+		jwt.verify(
+			req.cookies['access-token'],
+			keys.authSecret,
+			(err, decoded) => {
+				if (err) {
+					res.send('Error: ', err);
+				}
+				req.decodedToken = decoded;
+				next();
+			}
+		);
 	}
+	req.decodedToken = false;
 	next();
 });
 //=====================================================
+const User = mongoose.model('user');
+//=====================================================
 app.post('/login', (req, res) => {
-	if (!req.authCookie) {
-		// Check login and set auth JWT
-		res.cookie('user', 'Josh Bowden', {
-			expires: new Date(Date.now() + 900000),
+	if (!req.decodedToken) {
+		// CHECK USERS EXISTENCE BECAUSE NO AUTH TOKEN
+		// User.findOne({ email: req.body.email }, (err, user) => {
+		// 	if (err) {
+		// 		res.send('Error: ', err);
+		// 	}
+		// 	// Checks password against DB
+		// 	const userAuth = user.validPassword(req.body.password);
+		// 	if (userAuth) {
+		// 		res.cookie('user', 'Josh Bowden', {
+		// 			expires: new Date(Date.now() + 900000),
+		// 			httpOnly: true,
+		// 			overwrite: true,
+		// 		});
+		// 		res.send('user logged in and cookie set');
+		// 	}
+		// });
+		const refreshToken = jwt.sign(
+			{ userId: 'Example User ID', count: 'Example Count' },
+			keys.authSecret,
+			{
+				expiresIn: '7d',
+			}
+		);
+		const accessToken = jwt.sign(
+			{ userId: 'Example User ID' },
+			keys.authSecret,
+			{
+				expiresIn: '15min',
+			}
+		);
+		res.cookie('refresh-token', refreshToken, {
+			expires: new Date(Date.now() + 60 * 60 * 24 * 7),
 			httpOnly: true,
 			overwrite: true,
 		});
-		res.send('cookie set');
+		res.cookie('access-token', accessToken, {
+			expires: new Date(Date.now() + 60 * 60 * 24 * 7),
+			httpOnly: true,
+			overwrite: true,
+		});
+		res.send('got it');
 	} else {
 		// Check Auth Data from JWT update Refresh Token
-		res.cookie('user', 'Josh Bowden', {
-			expires: new Date(Date.now() + 900000),
+		const refreshToken = jwt.sign(
+			{ userId: 'Example User ID', count: 'Example Count' },
+			keys.authSecret,
+			{
+				expiresIn: '7d',
+			}
+		);
+		res.cookie('refresh-token', refreshToken, {
+			expires: new Date(Date.now() + 60 * 60 * 24 * 7),
 			httpOnly: true,
 			overwrite: true,
 		});
-		res.send(req.cookies.user + ' is logged in.');
+		res.send(req.decodedToken);
+		// res.send(req.cookies.user + ' is logged in.');
 	}
 });
 //=====================================================
@@ -97,10 +153,11 @@ app.post('/upload/:modelName/:modelId', (req, res) => {
 // The graphql route that handles all requests
 app.use(
 	'/graphql',
-	graphqlHTTP({
+	graphqlHTTP(req => ({
 		schema,
 		graphiql: true,
-	})
+		context: req.decodedToken,
+	}))
 );
 //=====================================================
 
