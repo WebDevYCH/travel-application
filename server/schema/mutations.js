@@ -47,7 +47,12 @@ const mutation = new GraphQLObjectType({
 				email: { type: GraphQLString },
 				password: { type: GraphQLString },
 			},
-			resolve(parentValue, { id, name, email, password }) {
+			resolve(parentValue, { id, name, email, password }, context) {
+				// Somehow check this data aligns with the User being updated before actually updating
+				// How do I make sure the tests still run correctly
+				if (context) {
+					console.log('CONTEXT: ', context.decodedToken);
+				}
 				if (password) {
 					password = User.generateHash(password);
 				}
