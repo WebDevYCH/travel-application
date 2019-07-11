@@ -2,6 +2,8 @@ const express = require('express');
 const graphqlHTTP = require('express-graphql');
 const { buildSchema } = require('graphql');
 const mongoose = require('mongoose');
+const fileUpload = require('express-fileupload');
+const cloudFiles = require('cloudinary').v2;
 //=====================================================
 
 const app = express();
@@ -29,6 +31,29 @@ mongoose.connect(MONGO_URI, {
 mongoose.connection
 	.once('open', () => console.log('Connected to MongoLab instance.'))
 	.on('error', error => console.log('Error connecting to MongoLab:', error));
+//=====================================================
+app.use(
+	fileUpload({
+		useTempFiles: true,
+	})
+);
+
+cloudFiles.config({
+	cloud_name: keys.cloudName,
+	api_key: keys.cloudKey,
+	api_secret: keys.cloudSecret,
+});
+
+app.post('/upload', (req, res) => {
+	const file = req.files.photo;
+	console.log(req.files.photo);
+	cloudFiles.uploader.upload(file.tempFilePath, (err, result) => {
+		if (err) {
+			console.log('Error: ', err);
+		}
+		res.send(result);
+	});
+});
 //=====================================================
 
 // The graphql route that handles all requests
